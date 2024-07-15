@@ -3,335 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Additionally, WastEnde&real; operates waste-to-energy plants, converting non-recyclable waste into renewable energy, which helps lower greenhouse gas emissions. Community engagement and education are also vital to WastEnd's strategy. Leading the way in sustainable waste management. WastEnd is a trailblazing waste management company committed to innovation and sustainability. Founded with the mission to revolutionize waste handling, WastEnd employs advanced technologies to enhance efficiency and reduce environmental impact.<p>This involves minimizing waste generation and maximizing the reuse and recycling of materials. The company collaborates with manufacturers to design products that are easier to recycle, thereby reducing landfill waste. Ensures maximum efficiency and accuracy in sorting recyclable materials. Our name says it all: WastEnde&real; executes practical strategies to achieve waste-ending outcomes for municipalities, schools, commercial operations, construction sites, and federal buildings.">
-    <title>WastEnde&real; - Sustainable Waste Management</title>
-    <link rel="icon" href="../WastEndK.ico" name="x-image/icon">
+    <title>AMBU&real;S - Home</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+        title {
+        font-family: 'monospace';
         }
-        header {
-            background-color: rgba(51, 119, 51, 0.788);
-            color: white;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        body{
+        padding: 0;
+        background-color: #fff;
+        font-family: 'cursive';
+        align-items: center;
+        text-align: left;
         }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
+        header ol{
+        display: flex;
+        font-family: 'cursive';
+        align-items: right;
+        text-align: right;
+        border-bottom: 1px solid black;
         }
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 1rem;
-            margin: 0;
-            padding: 0;
+        li {
+        color: white;
+        margin-right: 12px;
+        align-items: right;
         }
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            transition: background 0.3s;
+        a {
+        text-decoration: none;
+        color: black;
         }
-        .nav-links a:hover {
-            background-color: #575757;
-            border-radius: 4px;
+        form {
+        display: grid;
         }
-        .hero {
-            background: #575757;
-            color: #ffffff;
-            text-align: center;
-            padding: 6rem 1rem;
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKMQ_dCPr-3Gj1-j1LDFeh5yJa-Uc4mpgtrg&s');
-            background-position: center; 
-            background-size: cover;
-        }
-        .hero h1 {
-            margin: 0;
-            font-size: 3rem;
-            letter-spacing: 2px;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            margin: 1rem 0;
-        }
-        .hero button {
-            padding: 0.7rem 1.5rem;
-            font-size: 1rem;
-            cursor: pointer;
-            background-color: #373;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .hero button:hover {
-            background-color: #205c20c9;
-        }
-        section {
-            padding: 4rem 1rem;
-            text-align: center;
-            background-color: white;
-            margin-bottom: 1rem;
-        }
-        section:nth-of-type(even) {
-            background-color: #e9e9e9;
-        }
-        section h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        .service {
-            margin: 1rem 0;
-            padding: 1rem;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            transition: box-shadow 0.3s;
-            cursor: pointer;
-            display: -moz-inline-grid;
-            grid-template-columns: auto auto auto;
-        }
-        .service:hover {
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            color: #ffffff;
-            background-color: #373;
-            grid: 0;
-            display: -moz-inline-grid;
-        }
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .contact-form input, .contact-form textarea, .contact-form button {
-            padding: 0.5rem;
-            font-size: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .contact-form button {
-            background-color: #373;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .contact-form button:hover {
-            background-color: #2b5e1cb7;
-        }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 100%;
-            text-align: left;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .modal-header h3 {
-            margin: 0;
-        }
-        .modal-close {
-            cursor: pointer;
-            font-size: 1.5rem;
-            border: none;
-            background: none;
-        }
-        #about p{
-            text-align: left;
-        }
-        #about h1{
-            text-align: center;
-        }
-        .logo a{
-            color: white;
-            text-decoration: none;
-        }
-        .mission{
-            text-align: center;
-            align-items: center;
-            background-color: #fafafa;
-            padding: 5px;
-            margin: 10px;
-            border-radius: 16px;
-            color: #373;
-        }
-        .vision{
-            text-align: center;
-            align-items: center;
-            background-color: #fafafa;
-            padding: 5px;
-            margin: 10px;
-            border-radius: 16px;
-            color: #373;
+        h1 {
+            color: darkred;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const services = document.querySelectorAll('.service');
-            const modal = document.getElementById('service-modal');
-            const modalContent = document.getElementById('modal-content');
-            const modalClose = document.querySelector('.modal-close');
-
-            services.forEach(service => {
-                service.addEventListener('click', () => {
-                    const serviceDetails = service.getAttribute('data-details');
-                    const serviceImage = service.getAttribute('data-image')
-                    modalContent.innerHTML = `<div class="modal-header">
-                        <h3>${service.querySelector('h3').innerText}</h3>
-                        <button class="modal-close" onclick="closeModal()" style="color: red;">&times;</button>
-                    </div>
-                    <p>${serviceDetails}</p>
-                    <p><img src="${serviceImage}" width="100" height="100" style="align-items: center; text-align: center;"></p>
-                    <p style="text-align: center;">From WastEnde&real;&trade;</p>`;
-                    modal.style.display = 'flex';
-                });
-            });
-
-            modalClose.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        });
-
-        function closeModal() {
-            document.getElementById('service-modal').style.display = 'none';
-        }
-    </script>
 </head>
 <body>
+    <script>
+        console.alert('Tester')
+    </script>
     <header>
-        <div class="logo"><div onclick="scrollToSection('home')">WastEnde&real;</div></div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="./20230419_234343.jpg" download target="_blank">Creator</a></li>
-            </ul>
-        </nav>
+        <ol>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Report Bullying</a></li>
+            <li><a href="#">Contact</a></li>
+        </ol>
     </header>
-
-    <section id="home" class="hero">
-        <div style="background-color: #000000e5; padding: 20px;">
-        <h1 style="color: #373;">Waste is a problem &times; - We have solutions <a onclick="scrollToSection('services')" style="cursor: pointer;">&check;</a></h1>
-        <p>Additionally, WastEnde&real; operates waste-to-energy plants, converting non-recyclable waste into renewable energy, which helps lower greenhouse gas emissions. Community engagement and education are also vital to WastEnd's strategy. Leading the way in sustainable waste management. WastEnd is a trailblazing waste management company committed to innovation and sustainability. Founded with the mission to revolutionize waste handling, WastEnd employs advanced technologies to enhance efficiency and reduce environmental impact.<p>This involves minimizing waste generation and maximizing the reuse and recycling of materials. The company collaborates with manufacturers to design products that are easier to recycle, thereby reducing landfill waste. Ensures maximum efficiency and accuracy in sorting recyclable materials. Our name says it all: WastEnde&real; executes practical strategies to achieve waste-ending outcomes for municipalities, schools, commercial operations, construction sites, and federal buildings.</p>
-        <button onclick="scrollToSection('about')">Learn More</button>
-        </div>
-    </section>
-
-    <section id="about">
-        <h2>About Us</h2>
-        <p>WastEnde&real; is a trailblazing waste management company committed to innovation and sustainability. Founded with the mission to revolutionize waste handling, WastEnd employs advanced technologies to enhance efficiency and reduce environmental impact.</p><p> This involves minimizing waste generation and maximizing the reuse and recycling of materials. The company collaborates with manufacturers to design products that are easier to recycle, thereby reducing landfill waste.</p><p> Additionally, WastEnd operates waste-to-energy plants, converting non-recyclable waste into renewable energy, which helps lower greenhouse gas emissions.
-        
-        Community engagement and education are also vital to WastEnd's strategy.</p><p> They conduct workshops and programs in schools and communities to raise awareness about recycling and proper waste disposal. </p><p>Partnering with local governments and organizations, they implement tailored waste management solutions that meet specific community needs.
-                    
-        Looking to the future, WastEnd aims to develop biodegradable products and expand internationally. By sharing their innovative technologies and sustainable practices, they hope to address global waste management challenges. WastEnd’s comprehensive approach positions them as leaders in creating a sustainable future through effective waste management.</p>
-        <div style="display:grid; grid-template-columns: auto auto;">
-            <div class="mission">
-                <h2 style="text-align: center;">Our Mission</h2>
-                <p  style="text-align: center;">At WastEnde&real; we are commited to tackling waste through a multifaceted approach.</p>
-            </div>
-            <div class="vision">
-                <h2 style="text-align: center;">Our Vision</h2>
-                <p style="text-align: center;">Our Vision is to leverage advanced technology to create a seamless and eco-conscious marketplace. We aspire to create a community, where materials are used efficiently,and waste is minimized.</p>
-            </div>
-        </div>
-    </section>
-    <br/>
-    <br/>
-    <br/>
-    <section id="services">
-        <h2>Our Services</h2>
-        <div class="service" data-details="AI-powered technology for efficient recycling sorting. Our SmartSort system ensures maximum efficiency and accuracy in sorting recyclable materials. 
-        Smart Sort is a cutting-edge recycling solution that leverages artificial intelligence and advanced sensors to automate the sorting process. By using state-of-the-art cameras and algorithms, Smart Sort can accurately identify and separate various types of recyclable materials." data-image="https://www.recycleaway.com/cdn-cgi/image/quality%3D85/assets/images/product-photos/busch-systems/hires/smart-sort/SmartSort-Triple2.jpg" data-alt="SmartSort Bins">
-            <h3>SmartSort System </h3>
-            <p>AI-powered technology for efficient recycling.</p>
-        </div>
-        <div class="service" data-details="Converting non-recyclable waste into renewable energy. Our waste-to-energy plants provide a sustainable solution for waste management and energy production. Waste-to-energy incineration is an efficient waste management solution that diverts household waste and hazardous waste away from landfills while producing clean, renewable energy." data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt1ROJ3J7o7fZ3QBx5J9gwGVgS3EmYClfj4w&s"  data-alt="Waste Bins">
-            <h3>Waste-to-Energy </h3>
-            <p>Converting non-recyclable waste into renewable energy.</p>
-        </div>
-        <div class="service" data-details="Educational programs and workshops to promote sustainability. We engage with communities to raise awareness about proper waste management and recycling. taking a strategic approach to an organization's community-based stakeholders. This includes building relationships, developing communications, and managing interactions in order to achieve specific outcomes for the organization and the community itself." data-image="https://www.clarksvilleonline.com/wp-content/uploads/2017/10/APSUs-Center-for-Service-Learning-Community-Engagement-ramps-up-sustainability-efforts-with-compost-machine-1.jpg"  data-alt="Two people sortting waste">
-            <h3>Community Engagement </h3>
-            <p>Educational programs and workshops to promote sustainability.</p>
-        </div>
-        <div class="service" data-details="Smart waste bins are intelligent technological innovations that are embedded with sensors and even solar-powered trash compactors. In-built communication technology monitors fill levels and communicate with waste collection teams to optimize collection schedules." data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4VMH6e4gSANP36EfE0DJQKq5AJdPEU_G0_w&s"  data-alt="Smart Waste Bins">
-            <h3>Smart Waste Bins </h3>
-            <p>Technological innovations that are embedded with sensors and even solar-powered trash compactors</p>
-        </div>
-        <div class="service" data-details="Recycling robots that sort materials more accurately, waste-to-energy plants that convert waste into electricity or heat and biodegradable materials that reduce landfill contributions. The overheads that come from overstocking and overproduction can lead to a significant waste of resources. An effective way to combat this is by establishing a pull-based system so you only manufacture products when needed in a just-in-time fashion." data-image="https://media.istockphoto.com/id/1191750758/photo/robotic-arms-sorting-garbage-automatic-sorting-of-trash-3d-rendering-isolated-on-white.jpg?s=612x612&w=0&k=20&c=KlwmuLPBmxUHUlmw40zfOwkzvhpEoc-xnEODajgMeKk="  data-alt="Recycling Bots">
-            <h3>Recycling Robots </h3>
-            <p>Recycling robots that sort materials more accurately</p>
-        </div>
-    </section>
-
-    <section id="contact">
-        <h2>Contact Us &real;</h2>
-        <form class="contact-form">
-            <input type="text" id="name" name="name" placeholder="Your Name" required>
-            <input type="email" id="email" name="email" placeholder="Your Email" required>
-            <input type="text" name="subject" placeholder="Subjects" required>
-            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
-            <a href="mailto:denzelbabajide@gmail.com"><button type="submit" style="background-color: #373;">Send Message &check;</button></a>
-            <a><button type="reset" style="background-color: rgb(150, 31, 31);">Clear Message &times;</button></a>
-        </form>
-    </section>
-
-    <footer>
-        <p>&copy; 2024 WastEnde&real;&TRADE;. All rights reserved.</p>
-    </footer>
-
-    <div id="service-modal" class="modal">
-        <div id="modal-content" class="modal-content"></div>
-    </div>
+    <section>
+        <h1 style="text-align: center;">&pr;Anonymous Bullying Reporting Site&sc;</h1>
+        <form>
+            <label for="bully">Name of Bully: </label>
+            <select id="data">
+                <option> </option>
+                <option>Triston Cooper</option>
+                <option>Quinton Haley</option>
+                <option>Tomiloba Oluwunmi Opeyemi</option>
+                <option>Olaide Afunku</option>
+                <option>Abisoye Olumide Okonkwo</option>
+                <option>Johnson Joshua</option>
+                <option>Robert Østergaard Nyholm-Thrane</option>
+                <option>Oliver Vester</option>
+                <option>Esben Espersen</option>
+                <option>Jimmi Lindberg Abildgaard-Kaspersen</option>
+                <option>Kevin Mikkelsen-Overgaard Aagaard</option>
+                <option>Frode Damkjær-Vestergård Keller</option>
+                <option>Benny Høyer</option>
+                <option>Olaf Skovgaard Rask-Gundersen</option>
+                <option>Niklas Rasmussen Mathiasen</option>
+                <option>Elias Toft</option>
+                <option>Claus Olsen</option>
+                <option>Osvald Leth Isaksen</option>
+                <option>Arnau Puente</option>
+                <option>Francisco Javier Román</option>
+                <option>Cristian Naranjo Tercero</option>
+                <option>Ian Alvarado</option>
+            </select>
+            <label for="incident">Incident: </label>
+            <textarea></textarea>
+            <label for="time_date">Time & Date: </label>
+            <input type="time" id="time_date" name="time_date">
+            <input type="date" id="time_date" name="time_date">
+            <label for="proof">Evidence: </label>
+            <input type="file" id="proof" name="proof" value="Choose Evidence: ">
+            <label for="proof">Proof & Witness: </label>
+            <input type="text" id="proof" name="proof">
+            <a href="mailto:denzelbabajide@gmail.com"><input type="submit" id="enter" name="complete" value="Send"></a>
+        </form>      
+    </section>               
 </body>
 </html>
-
-   
