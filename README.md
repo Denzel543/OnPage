@@ -7,15 +7,18 @@
 3. print() Function
 4. First Challenge
 5. Variables
-6. More to Come... ⏰
+* 5.a Int
+* 5.b String
+* 5.c Float
+* More to Come... ⏰
 Updating Packet!
 ***
 # Getting Python🐍
-## Recommended
+## Recommended for any language
 * Using Github Online or Offline
 * Sublime Text
 * Download VSCode | Link: https://vscode.dev
-## Worth a Try
+## Just for Python
 * Google Colab | Link: https://colab.research.google.com
 * Jupyter Notebooks
 ***
@@ -44,6 +47,9 @@ What this does is that, python reads through the file and then takes the print()
 1. Create a simple print() function that introduces your name
 2. Make another print() function that shows your age, fav_color, fav_food, fav_number, hobby.
 3. Don't share with anyone, If you want to... Make every fact fake.
-4. And you're done!
+4. And you're done with your first challenge!
+***
+# Variables
+## Module 1: Int
 ***
 All rights reserved. AMBURS®️
