@@ -1,0 +1,2 @@
+variable = 'Python'
+print(variable)
