@@ -1,0 +1,10 @@
+from tkinter import *
+
+# button = you click it, then it does stuff
+
+window = Tk()
+
+button = Button(window)
+button.pack()
+
+window.mainloop()

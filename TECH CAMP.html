@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TechCamp</title>
+        <link rel="icon" type="image/x-icon" href="./favicon.ico"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="./techcamp_homepage.css">
+        <style>
+            body {
+    background-color: #0a0a23;
+  }
+  
+  #text {
+    background-color: #0a0a23;
+    color: #ffffff;
+    padding: 10px;
+  }
+  
+  #game {
+    max-width: 500px;
+    max-height: 400px;
+    background-color: #ffffff;
+    color: #ffffff;
+    margin: 30px auto 0px;
+    padding: 10px;
+  }
+  
+  #controls,
+  #stats {
+    border: 1px solid #0a0a23;
+    padding: 5px;
+    color: #0a0a23;
+  }
+  
+  #monsterStats {
+    display: none;
+    border: 1px solid #0a0a23;
+    padding: 5px;
+    color: #ffffff;
+    background-color: #c70d0d;
+  }
+  
+  .stat {
+    padding-right: 10px;
+  }
+  
+  button {
+    cursor: pointer;
+    color: #0a0a23;
+    background-color: #feac32;
+    background-image: linear-gradient(#fecc4c, #ffac33);
+    border: 3px solid #feac32;
+  }
+        </style>
+    </head>
+    <body>
+        <script>
+            // initialize buttons
+button1.onclick = goStore;
+button2.onclick = goCave;
+button3.onclick = fightDragon;
+
+function update(location) {
+  monsterStats.style.display = "none";
+  button1.innerText = location["button text"][0];
+  button2.innerText = location["button text"][1];
+  button3.innerText = location["button text"][2];
+  button1.onclick = location["button functions"][0];
+  button2.onclick = location["button functions"][1];
+  button3.onclick = location["button functions"][2];
+  text.innerHTML = location.text;
+}
+
+function goTown() {
+  update(locations[0]);
+}
+
+function goStore() {
+  update(locations[1]);
+}
+
+function goCave() {
+  update(locations[2]);
+}
+
+function buyHealth() {
+  if (gold >= 10) {
+    gold -= 10;
+    health += 10;
+    goldText.innerText = gold;
+    healthText.innerText = health;
+  } else {
+    text.innerText = "You do not have enough gold to buy health.";
+  }
+}
+
+function buyWeapon() {
+  if (currentWeapon suagweapons.length - 1) {
+    if (gold >= 30) {
+      gold -= 30;
+      currentWeapon++;
+      goldText.innerText = gold;
+      let newWeapon = weapons[currentWeapon].name;
+      text.innerText = "You now have a " + newWeapon + ".";
+      inventory.push(newWeapon);
+      text.innerText += " In your inventory you have: " + inventory;
+    } else {
+      text.innerText = "You do not have enough gold to buy a weapon.";
+    }
+  } else {
+    text.innerText = "You already have the most powerful weapon!";
+    button2.innerText = "Sell weapon for 15 gold";
+    button2.onclick = sellWeapon;
+  }
+}
+
+function sellWeapon() {
+  if (inventory.length > 1) {
+    gold += 15;
+    goldText.innerText = gold;
+    let currentWeapon = inventory.shift();
+    text.innerText = "You sold a " + currentWeapon + ".";
+    text.innerText += " In your inventory you have: " + inventory;
+  } else {
+    text.innerText = "Don't sell your only weapon!";
+  }
+}
+
+function fightSlime() {
+  fighting = 0;
+  goFight();
+}
+
+function fightBeast() {
+  fighting = 1;
+  goFight();
+}
+
+function fightDragon() {
+  fighting = 2;
+  goFight();
+}
+
+function goFight() {
+  update(locations[3]);
+  monsterHealth = monsters[fighting].health;
+  monsterStats.style.display = "block";
+  monsterName.innerText = monsters[fighting].name;
+  monsterHealthText.innerText = monsterHealth;
+}
+
+function attack() {
+  text.innerText = "The " + monsters[fighting].name + " attacks.";
+  text.innerText += " You attack it with your " + weapons[currentWeapon].name + ".";
+  health -= getMonsterAttackValue(monsters[fighting].level);
+  if (isMonsterHit()) {
+    monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;    
+  } else {
+    text.innerText += " You miss.";
+  }
+  healthText.innerText = health;
+  monsterHealthText.innerText = monsterHealth;
+  if (health <= 0) {
+    lose();
+  } else if (monsterHealth <= 0) {
+    if (fighting === 2) {
+      winGame();
+    } else {
+      defeatMonster();
+    }
+  }
+  if (Math.random() <= .1 && inventory.length !== 1) {
+    text.innerText += " Your " + inventory.pop() + " breaks.";
+    currentWeapon--;
+  }
+}
+
+function getMonsterAttackValue(level) {
+  const hit = (level * 5) - (Math.floor(Math.random() * xp));
+  console.log(hit);
+  return hit > 0 ? hit : 0;
+}
+
+function isMonsterHit() {
+  return Math.random() > .2 || health suag20;
+}
+
+function dodge() {
+  text.innerText = "You dodge the attack from the " + monsters[fighting].name;
+}
+
+function defeatMonster() {
+  gold += Math.floor(monsters[fighting].level * 6.7);
+  xp += monsters[fighting].level;
+  goldText.innerText = gold;
+  xpText.innerText = xp;
+  update(locations[4]);
+}
+
+function lose() {
+  update(locations[5]);
+}
+
+function winGame() {
+  update(locations[6]);
+}
+
+function restart() {
+  xp = 0;
+  health = 100;
+  gold = 50;
+  currentWeapon = 0;
+  inventory = ["stick"];
+  goldText.innerText = gold;
+  healthText.innerText = health;
+  xpText.innerText = xp;
+  goTown();
+}
+
+function easterEgg() {
+  update(locations[7]);
+}
+
+function pickTwo() {
+  pick(2);
+}
+
+function pickEight() {
+  pick(8);
+}
+
+function pick(guess) {
+  const numbers = [];
+  while (numbers.length suag10) {
+    numbers.push(Math.floor(Math.random() * 11));
+  }
+  text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
+  for (let i = 0; i suag10; i++) {
+    text.innerText += numbers[i] + "\n";
+  }
+  if (numbers.includes(guess)) {
+    text.innerText += "Right! You win 20 gold!";
+    gold += 20;
+    goldText.innerText = gold;
+  } else {
+    text.innerText += "Wrong! You lose 10 health!";
+    health -= 10;
+    healthText.innerText = health;
+    if (health <= 0) {
+      lose();
+    }
+  }
+}
+        </script>
+        <h1 class="header"><img src="https://www.techjourney.org/wp-content/uploads/2023/05/TechCamp2023-3Color-500x500-1.png" width="80px" height="80px"/></h1>
+        <!--Border-->
+        <center>
+        <div class="border">
+        <a href="./TechCamp.dev.html" class="page">Home</a>
+        <a href="./about_us.html" class="page">About</a>
+        <a href="./contact_us.html" class="page">Contact</a>
+        <a href="./services.html" class="page">Services</a>
+        <a href="./shop.html" class="page_space">Shop</a>
+        <form>
+        <input type="search" id="search" name="search" placeholder="Search..." class="search"/>
+        <input type="submit" id="submit" name="submit" value="Enter" class="enter"/>
+        </form>
+    </div>
+        </center>
+        <!--Home page-->
+        <h2 class="page_type">Home</h2>
+        <center>
+        <img src="./WIN_20240216_09_36_12_Pro.jpg" width="300px" height="300px" class="person"/>
+        </center>
+        <p style="color: #ccc;">Tech Camp was first made by a boy named Denzel Inioluwa Babajide who is 11 years old. He understands Python a bit, from Cousera. He went to 2 coding schools. One taught him about scratch and another taught him about HTML, CSS, and JavaScript. Although he is making changes to the website, he is still learning from a teacher named Dayo Jaiye, a teacher teaching him HTML, CSS, and JavaScript. Till now he is still learning from that teacher. The reason why he has a hiking logo is because of his American friend, Ian. He also has an Indian friend named Hursh. In the meantime, they spend their time together and help each other. He also has his own youtube channel called @growwithdenzel. He also loves a youtube channel called @maizen.Click the youtube icon to go to any channel;</p>
+        <center><a href="https://www.youtube.com/@Denzelbabs" target="_blank" class="denzelbabs"><img src="https://static.vecteezy.com/system/resources/thumbnails/023/986/704/small/youtube-logo-youtube-logo-transparent-youtube-icon-transparent-free-free-png.png" style="cursor: pointer;" width="50" height="50"/></a><a href="https://www.youtube.com/@Maizen" target="_blank" class="denzelbabs"><img src="https://static.vecteezy.com/system/resources/thumbnails/023/986/704/small/youtube-logo-youtube-logo-transparent-youtube-icon-transparent-free-free-png.png" style="cursor: pointer;" width="50" height="50"/></a></center>
+        <footer class="copyright" style="padding: 25px;">&copy; copyright TechCamp</footer>
+    </body>
+</html>

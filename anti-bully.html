@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Bullying Report</title>
+    <style>
+        input{
+            border-radius: 16px;
+            padding: 5px;
+        }
+        input:hover{
+            cursor: pointer;
+        }
+        img{
+            display: flex;
+            align-items: center;
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body style="background-color: lightgrey;">
+    <p style="margin-bottom: 100px;"></p>
+    <div style="align-items: center; text-align: center;">
+    <h1 style="color: white; background-color: grey; margin-left: 300px; margin-right: 300px; border: 1px solid black;">Anti-Bullying</h1>
+    </div>
+    <form style="align-items: center; text-align: center; border-radius: 4px; padding: 20px 12px; border: 1px solid black; margin-left: 300px; margin-right: 300px; background-color: white;">
+        <label for="problem">Problem:</label>
+        <p></p>
+        <input type="text" id="problem" name="problem">
+        <p></p>
+        <label for="reason">Reason:</label>
+        <p></p>
+        <input type="text" id="reason" name="reason">
+        <p></p>
+        <label for="help">How anti-bully.com can help:</label>
+        <p></p>
+        <textarea id="help" name="help" rows="8" style="border-radius: 12px;"></textarea>
+        <p></p>
+        <input type="submit" onclick="alert('Thanks for your feedback!')" style="background-color: green; color: white; font-family: 'Courier New', Courier, monospace;">
+    </form>
+    <p style="color: blue; text-align: center;">By Denzel Babajide</p>
+</body>
+</html>

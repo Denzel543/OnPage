@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" name="image/x-icon" href="./favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboTube - Channel</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #FF0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        form{
+            text-align: center;
+        }
+
+        input{
+            font-family: Monospace;
+        }
+        
+        select:hover{
+            cursor: pointer;
+        }
+
+        .checkmark{
+            font-size: 1.5rem;
+            border: none;
+            background-color: #ffffff;
+        }
+        .checkmark:hover{
+            color: blue;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ3qH-DFNhcIz5DnOdziKrPj1gHa9ZeGDAikoUfrfoKT8eXQpl7bTbOlTGqTqiBUBNHBI&usqp=CAU" width="70" height="50" style="border-radius: 20%;">
+        <h1>RoboTube</h1>
+        <p>Your One-Stop Video Website for Educational and Relaxing videos.</p>
+    </header>
+
+    <nav>
+        <a href="./RoboTube.html">Home</a>
+        <a href="./choice.html">Trending</a>
+        <a href="./channel.html">Your Channel</a>
+    </nav>
+    <h1 style="text-align: center;">Channel Info</h1>
+    <section>
+  </script>
+        <form>
+            <label>Channel Type:</label>
+            <select style="color: white; background-color: #333; border-radius: 16px; padding: 5px; font-family: Monospace;">
+                <option>Learning</option>
+                <option>Coding</option>
+                <option>Teaching</option>
+                <option>Relaxing</option>
+            </select>
+            <p></p>
+            <label for="channel-name">Channel Name:</label>
+            <input type="text" id="channel-name" name="channel-name" style="border-radius: 16px; padding: 5px;">
+            <p></p>
+            <label for="channel-link">Channel Link:</label>
+            <input type="text" id="channel-link" name="channel-link" placeholder=" @example" style="border-radius: 16px; padding: 5px;">
+            <p></p>
+            <label for="age-restrict">Age Restriction:</label>
+            <select style="color: white; background-color: #333; border-radius: 16px; padding: 5px; font-family: Monospace;">
+                <option>None</option>
+                <option>5 - 8</option>
+                <option>13 - 18</option>
+            </select>
+            <p></p>
+            <label for="channel-descrip">Channel Description:</label>
+            <p></p>
+            <textarea type="text" id="channel-descrip" name="channel-descrip" style="border-radius: 16px; padding: 5px;" rows="5" cols="35"></textarea>
+        </form>
+    </section>
+    <footer>
+        <p>&copy; 2024 RoboTube</p>
+    </footer>
+
+</body>
+</html>

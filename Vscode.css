@@ -1,0 +1,39 @@
+*{
+    box-sizing: border-box;
+    object-fit: cover;
+}
+h5{
+    background-color: darkblue;
+    color: white;
+    padding: 2px;
+    border: 2px solid darkblue;
+}
+a{
+    background-color: darkblue;
+    color: white;
+    white-space: space-between;
+    padding: 2px;
+    border: 2px solid darkblue;
+}
+.bar{
+    background-color: rgb(21, 22, 22);
+    padding: 5px;
+    align-items: center;
+}
+.search{
+    border-radius: 6px;
+    padding: 5px;
+    border: white 1px solid;
+}
+.explorer{
+    border: 1px solid black;
+    background-color: grey;
+    padding: 12px;
+    text-align: center;
+    align-items: center;
+}
+.vscode{
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAAhcOPUS54GiYC3q8VpZfLyHdMVnkvQHuFAgQNIBHtQ&s');
+    background-position: center;
+    background-size: cover;
+}

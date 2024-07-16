@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" name="image/x-icon" href="./favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboTube</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #FF0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        input{
+            font-family: Monospace;
+        }
+
+        section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .like{
+            font-size: 1.5rem;
+            padding: 5px 12px;
+            color: black;
+            background-color: #ffffff;
+            border: 1px solid black;
+            border-radius: 16px;
+        }
+        .like:hover{
+            color: red;
+            cursor: pointer;
+        }
+        .star{
+            font-size: 1.3rem;
+            padding: 5px 12px;
+            color: black;
+            background-color: #ffffff;
+            border: 1px solid black;
+            border-radius: 16px;
+        }
+        .star:hover{
+            color: yellow;
+            cursor: pointer;
+        }
+        .video {
+            margin: 20px;
+            max-width: 500px;
+            float: left;
+            align-items: left;
+            text-align: center;
+        }
+
+        .checkmark{
+            font-size: 1.5rem;
+            border: none;
+            background-color: #ffffff;
+        }
+        .checkmark:hover{
+            color: blue;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .share{
+            border-top: black 1px solid;
+            padding: 3px;
+            align-items: center;
+            text-align: center;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ3qH-DFNhcIz5DnOdziKrPj1gHa9ZeGDAikoUfrfoKT8eXQpl7bTbOlTGqTqiBUBNHBI&usqp=CAU" width="70" height="50" style="border-radius: 20%;">
+        <h1>RoboTube</h1>
+        <p>Your One-Stop Video Website for Educational and Relaxing videos.</p>
+        <form>
+        <label for="search">Search:</label>
+        <input type="search" id="search" name="search" style="border-radius: 16px; padding: 5px;">
+        <input type="submit" value="Search" style="border-radius: 16px; background-color: black; color: #ffffff; padding: 5px; cursor: pointer;">
+        </form>
+    </header>
+
+    <nav>
+        <a href="./RoboTube.html">Home</a>
+        <a href="./choice.html">Trending</a>
+        <a href="./channel.html">Your Channel</a>
+    </nav>
+
+    <section>
+        <div class="video">
+            <iframe width="600" height="400" src="https://www.youtube.com/embed/i_LwzRVP7bg?si=xWoP6VC9TbJNE4K9" allowfullscreen></iframe>
+            <h2>freeCodeCamp.org <button class="checkmark" onclick="alert('This is Verified!')">&checkmark;</button></h2>
+            <p>Machine Learning for Everyone</p>
+        </div>
+        <!-- Add more video entries as needed -->
+    </section>
+    <div class="share">
+        <button class="like" onclick="alert('You Liked this!')" ondblclick="alert('You UnLiked this!')">&hearts;</button>
+        <button class="star" onclick="alert('You Starred this!')" ondblclick="alert('You UnStarred this!')">&star;</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 RoboTube</p>
+    </footer>
+
+</body>
+</html>

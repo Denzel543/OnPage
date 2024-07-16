@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D World with Character Movement and Block Interaction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Create a scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb); // Sky color
+
+        // Create a camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 3, 10);
+
+        // Create a renderer
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a ground
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
+        const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22 }); // Green color for ground
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = - Math.PI / 2; // Rotate to make it flat
+        scene.add(ground);
+
+        // Load character texture
+        const textureLoader = new THREE.TextureLoader();
+        const characterTexture = textureLoader.load('path/to/your/image.png');
+
+        // Create a character
+        const characterGeometry = new THREE.BoxGeometry(1, 2, 0.5);
+        const characterMaterial = new THREE.MeshBasicMaterial({ map: characterTexture });
+        const character = new THREE.Mesh(characterGeometry, characterMaterial);
+        character.position.set(0, 1, 0);
+        scene.add(character);
+
+        // Variables for character movement
+        const moveSpeed = 0.1;
+        const jumpHeight = 4;
+        let jumping = false;
+
+        // Variables for block interaction
+        const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const blockMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const blocks = []; // Array to store blocks
+
+        // Keyboard controls
+        const keys = {};
+        document.addEventListener('keydown', event => {
+            keys[event.key] = true;
+        });
+        document.addEventListener('keyup', event => {
+            keys[event.key] = false;
+        });
+
+        // Add/remove block on mouse click
+        document.addEventListener('mousedown', event => {
+            if (event.button === 0) { // Left mouse button
+                const block = new THREE.Mesh(blockGeometry, blockMaterial);
+                const intersection = getIntersection(event.clientX, event.clientY);
+                if (intersection) {
+                    const { x, y, z } = intersection.point;
+                    block.position.set(Math.floor(x) + 0.5, Math.floor(y) + 0.5, Math.floor(z) + 0.5);
+                    scene.add(block);
+                    blocks.push(block);
+                }
+            } else if (event.button === 2) { // Right mouse button
+                const intersection = getIntersection(event.clientX, event.clientY);
+                if (intersection) {
+                    const blockToRemove = intersection.object;
+                    const index = blocks.indexOf(blockToRemove);
+                    if (index !== -1) {
+                        blocks.splice(index, 1);
+                        scene.remove(blockToRemove);
+                    }
+                }
+            }
+        });
+
+        // Helper function to get intersection point with the ground
+        function getIntersection(clientX, clientY) {
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(ground);
+            return intersects.length > 0 ? intersects[0] : null;
+        }
+
+        // Check collisions between character and blocks
+        function checkCollisions() {
+            const originPoint = character.position.clone();
+            for (let vertexIndex = 0; vertexIndex suagcharacter.geometry.vertices.length; vertexIndex++) {
+                const localVertex = character.geometry.vertices[vertexIndex].clone();
+                const globalVertex = localVertex.applyMatrix4(character.matrix);
+                const directionVector = globalVertex.sub(character.position);
+                const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+                const collisionResults = ray.intersectObjects(blocks);
+                if (collisionResults.length > 0 && collisionResults[0].distance suagdirectionVector.length()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Character movement
+            if (keys['ArrowUp']) {
+                character.position.z -= moveSpeed;
+                if (checkCollisions()) {
+                    character.position.z += moveSpeed;
+                }
+            }
+            if (keys['ArrowDown']) {
+                character.position.z += moveSpeed;
+                if (checkCollisions()) {
+                    character.position.z -= moveSpeed;
+                }
+            }
+            if (keys['ArrowLeft']) {
+                character.position.x -= moveSpeed;
+                if (checkCollisions()) {
+                    character.position.x += moveSpeed;
+                }
+            }
+            if (keys['ArrowRight']) {
+                character.position.x += moveSpeed;
+                if (checkCollisions()) {
+                    character.position.x -= moveSpeed;
+                }
+            }
+
+            // Character jumping
+            if (keys[' ']) { // Spacebar for jump
+                if (!jumping) {
+                    jumping = true;
+                    gsap.to(character.position, { y: character.position.y + jumpHeight, duration: 0.5, ease: 'power2.out',
+                        onComplete: () => {
+                            gsap.to(character.position, { y: 1, duration: 0.5, ease: 'power2.in',
+                                onComplete: () => {
+                                    jumping = false;
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

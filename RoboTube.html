@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" name="image/x-icon" href="./favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboTube</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #FF0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        input{
+            font-family: Monospace;
+        }
+
+        section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .video {
+            margin: 20px;
+            max-width: 300px;
+            text-align: center;
+            align-items: center;
+        }
+
+        .video iframe {
+            width: 100%;
+            height: 200px;
+        }
+
+        .checkmark{
+            font-size: 1.5rem;
+            border: none;
+            background-color: #ffffff;
+        }
+        .checkmark:hover{
+            color: blue;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ3qH-DFNhcIz5DnOdziKrPj1gHa9ZeGDAikoUfrfoKT8eXQpl7bTbOlTGqTqiBUBNHBI&usqp=CAU" width="70" height="50" style="border-radius: 20%;">
+        <h1>RoboTube</h1>
+        <p>Your One-Stop Video Website for Educational and Relaxing videos.</p>
+        <form>
+        <label for="search">Search:</label>
+        <input type="search" id="search" name="search" style="border-radius: 16px; padding: 5px;">
+        <input type="submit" value="Search" style="border-radius: 16px; background-color: black; color: #ffffff; padding: 5px; cursor: pointer;">
+        </form>
+    </header>
+
+    <nav>
+        <a href="./RoboTube.html">Home</a>
+        <a href="./choice.html">Trending</a>
+        <a href="./channel.html">Your Channel</a>
+    </nav>
+
+    <section>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/6cOsxaNC06c?si=ZF9ZS8EpANTDo-2c" allowfullscreen></iframe>
+            <h2 class="checkmark">Visual Studio Code &checkmark;</h2>
+            <p>VS Code - Debugging</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/98awWpkx9UM?si=LUrBArSQYXugTHoO" allowfullscreen></iframe>
+            <h2 class="checkmark">The Scratch Team &checkmark;</h2>
+            <p>Scratch 3.0 is here!</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/i_23KUAEtUM?si=YjoWoQHzhBwLx9ju" allowfullscreen></iframe>
+            <h2 class="checkmark">Visual Studio Code &checkmark;</h2>
+            <p>Using Git with VS Code</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/amIS2ZnMagg?si=8JrbhTt-n_sjoS_d" allowfullscreen></iframe>
+            <h2 class="checkmark">Exploria &checkmark;</h2>
+            <p>Fly around Copenhagen, Denmark. You will not believe your eyes.</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/SKcZ3cwX8lA?si=Qn81drYfqojIGyoj" allowfullscreen></iframe>
+            <h2 class="checkmark">Visual Studio Code &checkmark;</h2>
+            <p>Unlock the power of Visual Studio Code Extensions.</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/x9tJzZLGxA0?si=QxTFPM_HHuGtEKMi" allowfullscreen></iframe>
+            <h2>Relaxing Nature Music</h2>
+            <p>Amazing Aerial View Of Singapore | Relaxation film with calming music</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/B-s71n0dHUk?si=K4hAIcK0nK76F3Ig" allowfullscreen></iframe>
+            <h2 class="checkmark">Visual Studio Code &checkmark;</h2>
+            <p>Getting Started with Visual Studio Code</p>
+        </div>
+        <div class="video">
+            <iframe width="300" height="200" src="https://www.youtube.com/embed/i_LwzRVP7bg?si=xWoP6VC9TbJNE4K9" allowfullscreen></iframe>
+            <h2 class="checkmark">freeCodeCamp.org &checkmark;</h2>
+            <p>Machine Learning for Everyone</p>
+        </div>
+        <!-- Add more video entries as needed -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 RoboTube</p>
+    </footer>
+
+</body>
+</html>
