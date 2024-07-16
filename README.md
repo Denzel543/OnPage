@@ -1,6 +1,7 @@
 # The Complete Python GuideBook 👍
+# Might Get You a Real Job 💰
 ## Contents of Table
- 0.0 Find Python projects at this channel = https://www.youtube.com/@DenzelBabs
+ ⭐ Find Python projects at this channel = https://www.youtube.com/@DenzelBabs
 1. Getting Python
 2. Opening Codespace
 3. print() Function
@@ -9,11 +10,11 @@
 6. More to Come... ⏰
 Updating Packet!
 ***
-# Getting Python
+# Getting Python🐍
 ## Recommended
 * Using Github Online or Offline
 * Sublime Text
-* Download VSCode
+* Download VSCode | Link: https://vscode.dev
 ## Worth a Try
 * Google Colab | Link: https://colab.research.google.com
 * Jupyter Notebooks
@@ -35,8 +36,14 @@ For people with a github account:
 4. Call this file index.py
 5. Inside the file, Write the word 'print("Hello World")'
 ## For Google Colab:
-Do step 5 only
+Do step 5 in Github only
 #### Explanation of Code
 What this does is that, python reads through the file and then takes the print() function and prints the words inside onto the terminal
+# First Challenge
+## Challenge Steps
+1. Create a simple print() function that introduces your name
+2. Make another print() function that shows your age, fav_color, fav_food, fav_number, hobby.
+3. Don't share with anyone, If you want to... Make every fact fake.
+4. And you're done!
 ***
 All rights reserved. AMBURS®️
