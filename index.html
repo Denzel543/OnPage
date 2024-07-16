@@ -68,9 +68,9 @@
             </nav>
         </section>
         <section style="float: right; border-left: 1px solid black; padding-right: 50px; padding: 12px;">
-            <form action="mailto:denzelbabajide@gmail.com" method="GET">
+            <form method="post">
                 <label for="bully">Name of Bully: </label>
-                <select id="data">
+                <select id="bully">
                     <option> </option>
                     <option>Triston Cooper</option>
                     <option>Quinton Haley</option>
@@ -96,7 +96,7 @@
                     <option>Ian Puente</option>
                 </select>
                 <label for="incident">Incident: </label>
-                <textarea style="width: 711px; height: 196px;"></textarea>
+                <textarea style="width: 711px; height: 196px;" id="incident"></textarea>
                 <label for="time_date">Time & Date: </label>
                 <input type="time" id="time_date" name="time_date">
                 <input type="date" id="time_date" name="time_date">
@@ -108,6 +108,31 @@
             </form>     
         </section>  
     </section>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        var btn = getElementById('enter');
+        btn.addEventListener('click', function(e) {
+            e.preventDefault()
+            var bully = getElementById('bully').value;
+            var incident = getElementById('incident').value;
+            var time_date = getElementById('time_date').value;
+            var proof = getElementById('proof').value;
+            var body = 'Bully: ' +bully+ '. Incident: ' +incident+ '. Time & Date: ' +time_date+ ' Proof: ' +proof
+            Email.send({
+    Host : "smtp.gmail.com",
+    Username : "denzelbaabjide@gmail.com",
+    Password : "ALP75ear",
+    To : 'denzelbabajide@gmail.com',
+    From : "anonymous@gmail.com",
+    Subject : "Bully Form",
+    Body : incident,
+    When : time_date,
+    Proof : proof,
+}).then(
+  message => alert(message)
+);
+        })
+    </script>
     <footer style="color: white; background-color: black; padding: 5px;">Copyright &copy; AMBURS. All rights reserved</footer>
 </body>
 </html>
