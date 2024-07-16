@@ -32,6 +32,7 @@
                 <h2>Basics of Python / Setting up the environment</h2>
                 <section id="intro">
                 <h3>Introduction to Python and its applications</h3>
+                <section style="display: grid; grid-template-columns: auto auto;">
                   <p>History of Python
                       Python, created by Guido van Rossum and first released in 1991, has evolved significantly over the years. Its design philosophy emphasizes code readability and simplicity, making it an excellent choice for both beginners and experienced programmers.
                       
@@ -54,6 +55,7 @@
                     Miniconda: A minimal installer for Conda, useful for creating isolated environments.
                     For beginners, the standard distribution from python.org is recommended.
                   </p>
+                    </section>
                 </section> 
               </section>
           </section>
@@ -71,7 +73,92 @@ Python follows the principle of "There should be oneâ€”and preferably only oneâ€
             <h1 style="font-size: 2.5rem;">Week 2: Control Structures</h1>
             <h2>Conditional Statements, Loops, and Functions</h2>
             <h3>If-else statements and conditional expressions</h3>
-            <p></p>
+            <p>Python, a versatile and powerful programming language, utilizes control flow statements to direct the execution of code based on conditions. Among these control flow mechanisms, if-else statements and conditional expressions (also known as the ternary operator) play crucial roles in making decisions within programs. This essay will delve into the structure, use cases, and significance of these constructs in Python.
+
+If-Else Statements
+Structure of If-Else Statements
+The if-else statement allows the programmer to execute specific blocks of code based on the evaluation of conditions. The basic syntax is as follows:
+
+python
+Copy code
+if condition:
+    # Block of code to execute if condition is True
+else:
+    # Block of code to execute if condition is False
+Example of If-Else
+Consider a simple scenario where we want to check whether a number is even or odd:
+
+python
+Copy code
+number = 5
+
+if number % 2 == 0:
+    print("The number is even.")
+else:
+    print("The number is odd.")
+In this example, the condition checks if the remainder of number divided by 2 is zero. If true, it prints that the number is even; otherwise, it prints that the number is odd.
+
+The Elif Clause
+Python's if statement can also be extended with multiple conditions using elif (short for "else if"). This allows for more complex decision-making.
+
+python
+Copy code
+score = 85
+
+if score >= 90:
+    print("Grade: A")
+elif score >= 80:
+    print("Grade: B")
+elif score >= 70:
+    print("Grade: C")
+else:
+    print("Grade: D")
+Here, the program evaluates the score variable against multiple thresholds, providing a more nuanced output based on the score.
+
+Nested If Statements
+if-else statements can be nested, allowing for even more complex decision-making processes.
+
+python
+Copy code
+age = 18
+
+if age >= 18:
+    print("Adult")
+    if age >= 65:
+        print("Senior")
+else:
+    print("Minor")
+In this example, we first check if the person is an adult. If true, we then check if they are also a senior citizen.
+
+Conditional Expressions
+Conditional expressions, introduced in Python 2.5, provide a more concise way to write conditional logic in a single line. The syntax is as follows:
+
+python
+Copy code
+value_if_true if condition else value_if_false
+Example of a Conditional Expression
+Using the same example of checking whether a number is even or odd, we can rewrite it with a conditional expression:
+'number = 5
+result = "Even" if number % 2 == 0 else "Odd"
+print(result)' > Python Code
+This single line checks the condition and assigns either "Even" or "Odd" to the result variable, which is then printed.
+
+Use Cases for Conditional Expressions
+Conditional expressions are particularly useful for simplifying code where a simple condition is involved, often improving readability. They can be employed in assignments, function arguments, or return statements.
+              
+max_value = a if a > b else b > Python Code
+In this example, max_value will be assigned the greater of a or b.
+
+Comparison of If-Else Statements and Conditional Expressions
+While both if-else statements and conditional expressions allow for conditional execution, they serve different purposes:
+
+If-Else Statements: Better suited for complex decision-making with multiple conditions, especially when executing multiple statements based on those conditions.
+Conditional Expressions: Ideal for simple conditions and assignments, promoting more concise and readable code.
+Conclusion
+In summary, if-else statements and conditional expressions are fundamental components of Python programming, providing essential tools for control flow and decision-making. Mastering these constructs enables developers to write more effective and efficient code, enhancing both the functionality and readability of their programs. As with many programming concepts, the choice between if-else and conditional expressions will depend on the specific context and requirements of the task at hand. Understanding when and how to use these tools is key to becoming a proficient Python programmer.
+
+
+</p>
           </section>
           <section id="class3"></section>
           <section id="class4"></section>
