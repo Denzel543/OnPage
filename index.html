@@ -110,28 +110,27 @@
     </section>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script>
-        var btn = getElementById('enter');
-        btn.addEventListener('click', function(e) {
-            e.preventDefault()
-            var bully = getElementById('bully').value;
-            var incident = getElementById('incident').value;
-            var time_date = getElementById('time_date').value;
-            var proof = getElementById('proof').value;
-            var body = 'Bully: ' +bully+ '. Incident: ' +incident+ '. Time & Date: ' +time_date+ ' Proof: ' +proof
-            Email.send({
-    Host : "smtp.gmail.com",
-    Username : "denzelbaabjide@gmail.com",
-    Password : "ALP75ear",
-    To : 'denzelbabajide@gmail.com',
-    From : "anonymous@gmail.com",
-    Subject : "Bully Form",
-    Body : incident,
-    When : time_date,
-    Proof : proof,
-}).then(
-  message => alert(message)
-);
-        })
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('bully').value;
+    const email = document.getElementById('proof').value;
+    const message = document.getElementById('incident').value;
+
+    Email.send({
+        Host: "smtp@gmail.com",
+        Username: "denzelbabajide@gmail.com",
+        Password: "ALP75ear",
+        To: 'denzelbabajide@gmail.com',
+        From: email,
+        Subject: "New Message from " + name,
+        Body: message
+    }).then(
+        message => alert("Mail sent successfully!")
+    ).catch(
+        error => alert("Failed to send email: " + error)
+    );
+});
     </script>
     <footer style="color: white; background-color: black; padding: 5px;">Copyright &copy; AMBURS. All rights reserved</footer>
 </body>
