@@ -1,5 +1,5 @@
 # The Complete Python GuideBook 👍
-# Might Get You a Real Job 💰
+# The Ultimate for Beginners Costs: 1 star 🌟💰
 ## Contents of Table
  ⭐ Find Python projects at this channel = https://www.youtube.com/@DenzelBabs
 1. Getting Python
