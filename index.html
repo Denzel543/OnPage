@@ -138,11 +138,13 @@
     const email = document.getElementById('proof').value;
     const message = document.getElementById('incident').value;
         <? php 
+        mail(
             $to = "denzelbabajide@gmail.com"; 
         $subject = "AMBURS"; 
         $txt = "Message: " + message; 
         $headers = "From: mailsender@gmail.com"
-            ?>
+            )
+        confirm('Send Mail?')
     </script>
     <script>
         $mail = new PHPMailer\PHPMailer\PHPMailer(); 
