@@ -105,7 +105,7 @@
                 <input type="file" id="proof" name="proof" value="Choose Evidence: ">
                 <label for="proof">Proof & Witness: </label>
                 <input type="text" id="proof" name="proof">
-                <a><input type="submit" id="enter" name="complete" value="Send"></a>
+                <a href="mailto:denzelbabajide@gmail.com"><input type="submit" id="enter" name="complete" value="Send"></a>
             </form>     
         </section>  
     </section>
@@ -120,7 +120,7 @@
 
     Email.send({
         Host: "smtp@gmail.com",
-        Username: "denzelbabajide@gmail.com",
+        Username: "pearlrecycling@gmail.com",
         Password: "ALP75ear",
         To: 'denzelbabajide@gmail.com',
         From: email,
@@ -132,6 +132,26 @@
         error => alert("Failed to send email: " + error)
     );
 });
+    </script>
+    <script>
+    const name = document.getElementById('bully').value;
+    const email = document.getElementById('proof').value;
+    const message = document.getElementById('incident').value;
+        <? php 
+            $to = "denzelbabajide@gmail.com"; 
+        $subject = "AMBURS"; 
+        $txt = "Message: " + message; 
+        $headers = "From: mailsender@gmail.com"
+            ?>
+    </script>
+    <script>
+        $mail = new PHPMailer\PHPMailer\PHPMailer(); 
+        $mail->isSMTP(); 
+        $mail->Host = 'smtp.example.com'; 
+        $mail->SMTPAuth = true; $mail->Username = 'user@example.com';
+        $mail->Password = 'password';
+        $mail->setFrom('from@example.com', 'Mailer');
+        $mail->addAddress('to@example.com', 'Joe User'
     </script>
     <footer style="color: white; background-color: black; padding: 5px;">Copyright &copy; AMBURS. All rights reserved</footer>
 </body>
