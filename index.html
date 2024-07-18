@@ -138,22 +138,16 @@
     const email = document.getElementById('proof').value;
     const message = document.getElementById('incident').value;
         <? php 
-        mail(
-            $to = "denzelbabajide@gmail.com"; 
-        $subject = "AMBURS"; 
-        $txt = "Message: " + message; 
-        $headers = "From: mailsender@gmail.com"
+        <? php 
+            sendEmail(
+        $to = "denzelbabajide@gmail.com"; 
+        $subject = "Test Sender"; 
+        $txt = "Hello world!"; 
+        $headers = "From: AMBURS_mail@gmail.com"
             )
-        confirm('Send Mail?')
+        alert("Mail Sent Successfully")
     </script>
     <script>
-        $mail = new PHPMailer\PHPMailer\PHPMailer(); 
-        $mail->isSMTP(); 
-        $mail->Host = 'smtp.example.com'; 
-        $mail->SMTPAuth = true; $mail->Username = 'user@example.com';
-        $mail->Password = 'password';
-        $mail->setFrom('from@example.com', 'Mailer');
-        $mail->addAddress('to@example.com', 'Joe User'
     </script>
     <footer style="color: white; background-color: black; padding: 5px;">Copyright &copy; AMBURS. All rights reserved</footer>
 </body>
