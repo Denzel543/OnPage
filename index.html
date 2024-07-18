@@ -69,7 +69,7 @@
             </nav>
         </section>
         <section style="float: right; border-left: 1px solid black; padding-right: 50px; padding: 12px;">
-            <form method="get">
+            <form action="https://formsubmit.co/denzelbabajide@gmail.com" method="POST">
                 <label for="bully">Name of Bully: </label>
                 <select id="bully">
                     <option> </option>
@@ -105,49 +105,12 @@
                 <input type="file" id="proof" name="proof" value="Choose Evidence: ">
                 <label for="proof">Proof & Witness: </label>
                 <input type="text" id="proof" name="proof">
-                <a href="mailto:denzelbabajide@gmail.com"><input type="submit" id="enter" name="complete" value="Send"></a>
+                <button type="sumbit"></button>
             </form>     
         </section>  
     </section>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script>
-        document.getElementById('enter').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('bully').value;
-    const email = document.getElementById('proof').value;
-    const message = document.getElementById('incident').value;
-
-    Email.send({
-        Host: "smtp@gmail.com",
-        Username: "pearlrecycling@gmail.com",
-        Password: "ALP75ear",
-        To: 'denzelbabajide@gmail.com',
-        From: email,
-        Subject: "New Message from " + name,
-        Body: message
-    }).then(
-        message => alert("Mail sent successfully!")
-    ).catch(
-        error => alert("Failed to send email: " + error)
-    );
-});
-    </script>
-    <script>
-    const name = document.getElementById('bully').value;
-    const email = document.getElementById('proof').value;
-    const message = document.getElementById('incident').value;
-        <? php 
-        <? php 
-            sendEmail(
-        $to = "denzelbabajide@gmail.com"; 
-        $subject = "Test Sender"; 
-        $txt = "Hello world!"; 
-        $headers = "From: AMBURS_mail@gmail.com"
-            )
-        alert("Mail Sent Successfully")
-    </script>
-    <script>
+        
     </script>
     <footer style="color: white; background-color: black; padding: 5px;">Copyright &copy; AMBURS. All rights reserved</footer>
 </body>
