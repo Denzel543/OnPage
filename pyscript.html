@@ -88,7 +88,6 @@ dices = [
 ]
 
 def roll_dice():
-  global dice
   dice = random.randint(1, 6)
   dice2 = random.randint(1, 6)
   return dice
@@ -97,7 +96,7 @@ while 1:
   y_n = input("Do you want to roll a dice y/n: ")
   if y_n == 'y':
     print("Rolling Dice...")
-    dice_roll = roll_dice()
+    roll_dice()
     typo = dice
     print(f"""
         {dices[dice]}""")
@@ -119,7 +118,7 @@ while 1:
         <img src="https://static-00.iconduck.com/assets.00/die-face-2-emoji-254x256-j92gozvh.png" width="50" height="50">
         <img src="https://static-00.iconduck.com/assets.00/die-face-3-emoji-510x512-yiitewkt.png" width="50" height="50">
         <img src="https://static-00.iconduck.com/assets.00/die-face-4-emoji-254x256-g37um32i.png" width="50" height="50">
-        <img src="https://static-00.iconduck.com/assets.00/die-5-icon-510x512-lv0g4zyr.png" width="50" height="50">
+        <img src="https://cdn2.iconfinder.com/data/icons/dice-roll/100/dice_5-512.png" width="50" height="50">
         <img src="https://static-00.iconduck.com/assets.00/die-face-6-emoji-510x512-lv0g4zyr.png" width="50" height="50">
     </p>
 </body>
