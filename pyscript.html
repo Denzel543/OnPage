@@ -43,12 +43,75 @@
 </head>
 <body>
     <py-script>
-        print("Welcome to Python on HTML!")
-        <p style="border: 1px solid black; background-color: grey; color: white;">
-        name = input("")
-        key = input("")
-        </p>
-        print(f"Name: {name}. Your Password is: {key}")
+        # @title Dice simulator 2
+import random
+
+dices = [
+'''
+''',
+'''
+┌─────────┐
+│         │
+│    ●    │
+│         │
+└─────────┘''',
+'''
+┌─────────┐
+│ ●       │
+│         │
+│       ● │
+└─────────┘''',
+'''
+┌─────────┐
+│ ●       │
+│    ●    │
+│       ● │
+└─────────┘''',
+'''
+┌─────────┐
+│  ●   ●  │
+│         │
+│  ●   ●  │
+└─────────┘''',
+      '''
+┌─────────┐
+│  ●   ●  │
+│    ●    │
+│  ●   ●  │
+└─────────┘''',
+      '''
+┌─────────┐
+│  ●   ●  │
+│  ●   ●  │
+│  ●   ●  │
+└─────────┘'''
+]
+
+def roll_dice():
+  global dice
+  dice = random.randint(1, 6)
+  dice2 = random.randint(1, 6)
+  return dice
+
+while 1:
+  y_n = input("Do you want to roll a dice y/n: ")
+  if y_n == 'y':
+    print("Rolling Dice...")
+    dice_roll = roll_dice()
+    typo = dice
+    print(f"{dices[dice]}")
+    value = int(input("Enter the number on the dice: "))
+    if value != dice:
+      print("You are not human.")
+      break
+    else:
+      print("Correct!")
+      break
+  elif y_n == 'n':
+    print("You are not human.")
+    break
+  else:
+    print("Invalid Input")
     </py-script>
 </body>
 </html>
