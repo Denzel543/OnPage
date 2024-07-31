@@ -94,12 +94,11 @@ def roll_dice():
   return dice
 
 while 1:
-  y_n = input("Do you want to roll a dice y/n: ")
-  if y_n == 'y':
     print("Rolling Dice...")
     dice_roll = roll_dice()
     typo = dice
     print(f"{dices[dice]}")
+    print("Verifying if human")
     value = int(input("Enter the number on the dice: "))
     if value != dice:
       print("You are not human.")
@@ -107,11 +106,6 @@ while 1:
     else:
       print("Correct!")
       break
-  elif y_n == 'n':
-    print("You are not human.")
-    break
-  else:
-    print("Invalid Input")
     </py-script>
     <section class="front">
         <section style="float: left; border-right: 1px solid black; padding: 12px;">
