@@ -41,6 +41,76 @@
     </style>
 </head>
 <body>
+    <py-script># @title Dice simulator 2
+import random
+
+nums = [1, 2, 3, 4, 5, 6]
+dices = [
+'''
+''',
+'''┌─────────┐
+│         │
+│    ●    │
+│         │
+└─────────┘''',
+'''
+┌─────────┐
+│ ●       │
+│         │
+│       ● │
+└─────────┘''',
+'''
+┌─────────┐
+│ ●       │
+│    ●    │
+│       ● │
+└─────────┘''',
+'''
+┌─────────┐
+│  ●   ●  │
+│         │
+│  ●   ●  │
+└─────────┘''',
+      '''
+┌─────────┐
+│  ●   ●  │
+│    ●    │
+│  ●   ●  │
+└─────────┘''',
+      '''
+┌─────────┐
+│  ●   ●  │
+│  ●   ●  │
+│  ●   ●  │
+└─────────┘'''
+]
+
+def roll_dice():
+  global dice
+  dice = random.randint(1, 6)
+  dice2 = random.randint(1, 6)
+  return dice
+
+while 1:
+  y_n = input("Do you want to roll a dice y/n: ")
+  if y_n == 'y':
+    print("Rolling Dice...")
+    dice_roll = roll_dice()
+    typo = dice
+    print(f"{dices[dice]}")
+    value = int(input("Enter the number on the dice: "))
+    if value != dice:
+      print("You are not human.")
+      break
+    else:
+      print("Correct!")
+      break
+  elif y_n == 'n':
+    print("You are not human.")
+    break
+  else:
+    print("Invalid Input")
+    </py-script>
     <section class="front">
         <section style="float: left; border-right: 1px solid black; padding: 12px;">
             <nav>
