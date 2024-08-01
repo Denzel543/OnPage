@@ -91,6 +91,7 @@ def roll_dice():
   dice2 = random.randint(1, 6)
   return dice
 
+print(f"Dice number {dice}")
 roll_dice()
 </py-script>
     <py-script>
@@ -101,7 +102,8 @@ while 1:
     typo = dice
     print(f"""
         {dices[dice]}""")
-    value = input("Enter the number on the dice: ")
+    value = input("")
+    print(f"{Enter the number on the dice: }")
     if int(value) != dice:
       print("Wrong")
       break
