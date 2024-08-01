@@ -83,45 +83,33 @@ dices = [
 │  ●   ●  │
 └─────────┘'''
 ]
-</py-script>
-    <py-script>
-        # @title Dice simulator 2
-import random
-
 def roll_dice():
   global dice
   dice = random.randint(1, 6)
   dice2 = random.randint(1, 6)
   return dice
 
+roll_dice()
+</py-script>
+    <py-script>
+        # @title Dice simulator 2
+import random
+
 while 1:
-  y_n = input("Do you want to roll a dice y/n: ")
-  if y_n == 'y':
     print("Rolling Dice...")
-    roll_dice()
     typo = dice
     print(f"""
         {dices[dice]}""")
     value = input("Enter the number on the dice: ")
     if int(value) != dice:
-      print("You are not human.")
+      print("Wrong")
       break
     else:
       print("Correct!")
       break
-  elif y_n == 'n':
-    print("You are not human.")
-    break
-  else:
-    print("Invalid Input")
     </py-script>
-    <p style="border: 1px solid black; padding: 10px; margin: 10px; background-color: white;">
-        <img src="https://static-00.iconduck.com/assets.00/dice-1-icon-512x512-fr5yy7n7.png" width="50" height="50">
-        <img src="https://static-00.iconduck.com/assets.00/die-face-2-emoji-254x256-j92gozvh.png" width="50" height="50">
-        <img src="https://static-00.iconduck.com/assets.00/die-face-3-emoji-510x512-yiitewkt.png" width="50" height="50">
-        <img src="https://static-00.iconduck.com/assets.00/die-face-4-emoji-254x256-g37um32i.png" width="50" height="50">
-        <img src="https://cdn2.iconfinder.com/data/icons/dice-roll/100/dice_5-512.png" width="50" height="50">
-        <img src="https://static-00.iconduck.com/assets.00/die-face-6-emoji-510x512-lv0g4zyr.png" width="50" height="50">
-    </p>
+    <script>
+        console.log("Auhentication")
+    </script>
 </body>
 </html>
