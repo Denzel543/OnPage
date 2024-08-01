@@ -30,7 +30,7 @@
         }
         h1 {
             color: darkred;
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             text-align: center;
             align-items: center;
         }
@@ -49,51 +49,29 @@ dices = [
 '''
 ''',
 '''
-┌─────────┐</br>
-│         │</br>
-│    ●    │</br>
-│         │</br>
-└─────────┘</br>''',
+⚀''',
 '''
-┌─────────┐</br>
-│ ●       │</br>
-│         │</br>
-│       ● │</br>
-└─────────┘</br>''',
+⚁''',
 '''
-┌─────────┐</br>
-│ ●       │</br>
-│    ●    │</br>
-│       ● │</br>
-└─────────┘</br>''',
+⚂''',
 '''
-┌─────────┐</br>
-│  ●   ●  │</br>
-│         │</br>
-│  ●   ●  │</br>
-└─────────┘</br>''',
+⚃''',
       '''
-┌─────────┐</br>
-│  ●   ●  │</br>
-│    ●    │</br>
-│  ●   ●  │</br>
-└─────────┘</br>''',
+⚄''',
       '''
-┌─────────┐</br>
-│  ●   ●  │</br>
-│  ●   ●  │</br>
-│  ●   ●  │</br>
-└─────────┘</br>'''
+⚅'''
 ]
 def roll_dice():
   global dice
-  dice = random.randint(6, 6)
+  dice = random.randint(1, 6)
   dice2 = random.randint(1, 6)
   return dice
 
 
 roll_dice()
-print(f"Dice number {dice}")
+    <h1>
+    print(f"""{dices[dice]}""")
+    </h1>
 </py-script>
     <py-script>
         # @title Dice simulator 2
@@ -101,8 +79,6 @@ print(f"Dice number {dice}")
 while 1:
     print("Rolling Dice...")
     typo = dice
-    print(f"""
-        {dices[dice]}""")
     value = input("")
     print(f"Enter the number on the dice: {value}")
     if int(value) != dice:
