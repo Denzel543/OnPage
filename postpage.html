@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,700">
+    <title>PostPage</title>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <style href="styles.css" src="styles.css">
+        .post_title{
+            font-size: 1.5rem;
+            color: black;
+        }
+        .post_subtitle{
+            font-size: 0.5rem;
+            color: grey;
+        }
+        .post_word{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+            border-radius: 6px;
+        }
+        .post_sent{
+            background-color: blue;
+            color: white;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            padding-left: 6px;
+            padding-right: 6px;
+            border-radius: 6px;
+        }
+        .post_sent:hover{
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="post_title">PostPage</h1>
+    <p class="post_subtitle">What do you want to Post to Page?</p>
+    <div>
+        <py-script>page_word = Element('page_word')
+        
+        def on_click(*args, **kwargs):
+            input_value = page_word.element.value
+            message = f"Post: {input_value}"
+            pyscript.write('my-output', message)</py-script>
+
+        def page_word.press(e):
+            if e.click == 'Enter':
+                on_click()
+
+        page_word.element.onkeypress = page_word.press
+    </div>
+    <input
+        id="page_word"
+        class="post_word"
+        type="text">
+    <button
+        id="page_sent"
+        class="post_sent"
+        type="submit"
+        pys-onClick='on_click'>Post</button>
+</body>
