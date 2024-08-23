@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Healthcare Analytics</title>
+    <style>
+        #f_name{
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+.l_name {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+.date_of_birth {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+#nationality {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+label {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+.history_sick {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+#allergy {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+.hereditary_iss {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+    padding-right: 12px;
+    margin-right: 12px;
+}
+#sent {
+    background-color: green;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px;
+}
+    </style>
+</head>
+<body>
+    <div>
+        <h1>PHA - Predictive Healthcare Analytics</h1>
+        <form id="healthForm">
+            <h2>Get your healthcare here today.</h2>
+            <h4>Please fill the form</h4>
+            <label for="f_name">Enter First Name:</label>
+            <input type="text" id="f_name" class="f_name" placeholder="Enter First Name:" required>
+            <br>
+            <label for="l_name">Enter Last Name:</label>
+            <input type="text" id="l_name" class="l_name" placeholder="Enter Last Name" required>
+            <br>
+            <label for="date_of_birth">Enter your date of birth:</label>
+            <input type="date" id="date_of_birth" class="date_of_birth" required>
+            <br>
+            <label for="nationality">Enter Nationality: </label>
+            <input type="text" id="nationality" class="nationality" placeholder="Enter Your Nationality" required>
+            <br>
+            <label for="history_sick">Enter History of Sickness: </label>
+            <input type="text" id="history_sick" class="history_sick" placeholder="Enter History of Sickness" required>
+            <br>
+            <label for="allergy">Enter Allergy:</label>
+            <input type="text" id="allergy" class="allergy" placeholder="Enter Allergy (If you have)">
+            <br>
+            <label for="hereditary_iss">Enter Hereditary Issues: </label>
+            <input type="text" id="hereditary_iss" class="hereditary_iss" placeholder="Enter Issues (if you have)">
+            <br>
+            <br>
+            <br>
+            <br>
+            <button id="sent" class="sent" type="button">Get Supplement</button>
+            <p id="result"></p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('sent').addEventListener('click', function(e) {
+            e.preventDefault();
+            getSupplement();
+        });
+
+        function getSupplement() {
+            const f_name = document.getElementById('f_name').value;
+            const l_name = document.getElementById('l_name').value;
+            const date_of_birth = document.getElementById('date_of_birth').value;
+            const nationality = document.getElementById('nationality').value;
+            const history_sick = document.getElementById('history_sick').value;
+            const allergy = document.getElementById('allergy').value;
+            const hereditary_iss = document.getElementById('hereditary_iss').value;
+
+            const intro = ['Hello', 'Hi', 'Welcome'];
+            const explain = ['This is your needed supplement', 'Your needs are here', 'Here is your supplement'];
+
+            let supplement = '';
+
+            // Simple logic to determine supplement based on input
+            if (history_sick.toLowerCase().includes('insomnia') || history_sick.toLowerCase().includes('sleep')) {
+                supplement = fetch(`https://en.wikipedia.org/wiki/${history_sick}`, method="GET"), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        id: 13,
+                        name: 'muddy-murky',
+                    })
+                }
+                    .then(res => res.json)
+                    .then(data => console.log(data))
+            } else if (allergy.toLowerCase().includes('pollen') || allergy.toLowerCase().includes('hay fever')) {
+                supplement = "Quercetin, a natural antihistamine, might help alleviate your allergy symptoms.";
+            } else if (hereditary_iss.toLowerCase().includes('osteoporosis')) {
+                supplement = "Calcium and Vitamin D supplements are recommended to support bone health.";
+            } else {
+                supplement = "Based on the information provided, a general multivitamin might be beneficial for overall health.";
+            }
+
+            const randomIntro = intro[Math.floor(Math.random() * intro.length)];
+            const randomExplain = explain[Math.floor(Math.random() * explain.length)];
+
+            const essay = `${randomIntro} ${f_name} ${l_name}. ${randomExplain}: ${supplement}`;
+
+            document.getElementById('result').innerHTML = essay;
+
+            // Simulating delay
+            setTimeout(() => {
+                const updatedEssay = `${randomIntro} ${f_name} ${l_name}. Here's an update on your supplement recommendation: ${supplement}`;
+                document.getElementById('result').innerHTML = updatedEssay;
+            }, 30000);
+        }
+    </script>
+</body>
+</html>
