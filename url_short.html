@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>URL Shortener</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <main>
+            <h1>Enter a url to shorten:</h1>
+            <input type="text" id="url-input" value="http://geeklaunch.net" placeholder="http://geeklaunch.net/...">
+            <button id="shorten-button">Shorten!</button>
+            <pre id="out">Your URL will appear here...</pre>
+        </main>
+        <script>
+            const input = document.getElementById('url-input'),
+    button = document.getElementById('shorten-button'),
+    out = document.getElementById('out');
+
+input.focus();
+
+async function shorten (href) {
+    const shortid = (await (await fetch('/api/new', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({href}),
+    })).json()).shortid;
+
+    return shortid;
+}
+
+button.addEventListener('click', async () => {
+    const link = `${location.origin}/l/${await shorten(input.value)}`;
+    out.innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+});
+        </script>
+    </body>
+</html>
