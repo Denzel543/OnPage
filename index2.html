@@ -52,6 +52,7 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
+            margin-top: 10px;
         }
         #shortLink {
             margin-top: 20px;
@@ -61,6 +62,11 @@
             text-decoration: none;
             font-size: 1rem;
         }
+        .copy-button {
+            margin-top: 10px;
+            background-color: lightcoral;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -68,10 +74,9 @@
         <h1>URL SHORTENER</h1>
         <form id="urlForm">
             <label for="urlLink">Link:</label>
-            <input type="url" id="urlLink" placeholder="Paste URL Link Here" required>
+            <input type="url" id="urlLink" placeholder="Paste URL Link Here" required><button onclick="copyToClipboard(urlLink)">Copy</button>
             <button type="button" onclick="getLink()">Get Link</button>
             <div id="shortLink"></div>
-            <div id="result"></div>
         </form>
     </div>
     <script>
@@ -103,7 +108,8 @@
             // Update the DOM to display the new short link
             document.getElementById('shortLink').innerHTML = `
                 <a href="${urlLink}" target="_blank">Visit the original URL: ${urlLink}</a><br><br>
-                Shortened URL: <a href="${newLink}" target="_blank">${newLink}</a>
+                Shortened URL: <a href="${newLink}" target="_blank">${newLink}</a><br>
+                <button class="copy-button" onclick="copyToClipboard('${newLink}')">Copy</button>
             `;
         }
 
@@ -123,6 +129,15 @@
 
         // Check for redirection when the page loads
         handleRedirection();
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
     </script>
 </body>
 </html>
