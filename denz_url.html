@@ -85,11 +85,17 @@
         const randomNum = Math.floor(Math.random() * 100000); // Generate a random number between 0 and 999
         // Create a pseudo-shortened URL for demonstration purposes
         const newLink = `https://short.link/${randomNum}`;
-        const link = document.getElementById('result').innerHTML=`Redirect 301 /${newLink} /${urlLink}`
         
         // Update the DOM to display the new short link
         document.getElementById('shortLink').innerHTML = `<a href="${urlLink}" target="_blank">Visit the original URL: ${urlLink}</a><br><br>Shortened URL: <a href="${urlLink}" target="_blank">${newLink}</a>`;
     }
+        <?php
+if (isset($_GET['search']) && $_GET['search'] == newLink) {
+    header(`Location: ${urlLink}`);
+    exit();
+}
+?>
+
     </script>
 </body>
 </html>
