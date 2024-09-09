@@ -89,12 +89,6 @@
         // Update the DOM to display the new short link
         document.getElementById('shortLink').innerHTML = `<a href="${urlLink}" target="_blank">Visit the original URL: ${urlLink}</a><br><br>Shortened URL: <a href="${urlLink}" target="_blank">${newLink}</a>`;
     }
-        <?php
-if (isset($_GET['search']) && $_GET['search'] == newLink) {
-    header(`Location: ${urlLink}`);
-    exit();
-}
-?>
 
     </script>
 </body>
