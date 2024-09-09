@@ -16,7 +16,7 @@
             padding: 20px;
             margin: 50px auto;
             width: 80%;
-            max-width: 1000px;
+            max-width: 600px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -84,6 +84,7 @@
         const randomNum = Math.floor(Math.random() * 100000); // Generate a random number between 0 and 999
         // Create a pseudo-shortened URL for demonstration purposes
         const newLink = `https://short.link/${randomNum}`;
+        const link = newLink.textContent(`${urlLink}`)
         
         // Update the DOM to display the new short link
         document.getElementById('shortLink').innerHTML = `<a href="${urlLink}" target="_blank">Visit the original URL: ${urlLink}</a><br><br>Shortened URL: <a href="${urlLink}" target="_blank">${newLink}</a>`;
@@ -91,3 +92,8 @@
     </script>
 </body>
 </html>
+
+
+
+
+
