@@ -3,111 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denzel URL Shortener</title>
+    <title>URL Shortener</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
         .container {
             background-color: steelblue;
             padding: 20px;
-            margin: 100px auto;
-            border-radius: 20px;
+            margin: 50px auto;
+            width: 80%;
             max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         h1 {
             background-color: lightblue;
             border-radius: 12px;
             text-align: center;
+            margin: 0;
             padding: 10px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         label {
             font-size: 1.5rem;
+            margin-bottom: 10px;
         }
         input[type="url"] {
             border-radius: 16px;
             padding: 12px;
-            padding-right: 30px;
-            width: calc(100% - 80px);
+            width: 100%;
+            max-width: 500px;
             margin-bottom: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
         }
         button {
             background-color: lightskyblue;
             border-radius: 16px;
             padding: 12px;
             border: none;
-            color: white;
             cursor: pointer;
+            font-size: 1rem;
         }
-        button:hover {
-            background-color: deepskyblue;
+        #shortLink {
+            margin-top: 20px;
         }
-        .shortLink {
-            color: white;
-        }
-        .error {
-            color: red;
+        #shortLink a {
+            color: #333;
+            text-decoration: none;
             font-size: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="container" style="border: 1px solid steelblue;">
-        <h1>DENZEL URL SHORTENER</h1>
-        <center>
-            <form id="urlForm">
-                <label for="urlLink">Link:</label>
-                <input type="url" id="urlLink" placeholder="Paste URL Link Here" required>
-                <button type="button" onclick="getLink()">Get Link</button>
-                <div id="shortLink"></div>
-                <div id="error" class="error" style="padding-top: 12px;"></div>
-            </form>
-        </center>
+    <div class="container">
+        <h1>URL SHORTENER</h1>
+        <form id="urlForm">
+            <label for="urlLink">Link:</label>
+            <input type="url" id="urlLink" placeholder="Paste URL Link Here" required>
+            <button type="button" onclick="getLink()">Get Link</button>
+            <div id="shortLink"></div>
+        </form>
     </div>
-    <script>
-        async function getLink() {
-            const urlLink = document.getElementById('urlLink').value;
-            const errorDiv = document.getElementById('error');
-            const shortLinkDiv = document.getElementById('shortLink');
-
-            // Clear previous error and short link
-            errorDiv.textContent = '';
-            shortLinkDiv.innerHTML = '';
-
-            // Validate URL
-            try {
-                new URL(urlLink);
-            } catch (_) {
-                errorDiv.textContent = 'Please enter a valid URL.';
-                return;
-            }
-
-            // Make API request to TinyURL
-            try {
-                const response = await fetch(`https://api.tinyurl.com/v1/shorten?url=${encodeURIComponent(urlLink)}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                console.log(response.ok)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
-                }
-
-                const data = await response.json();
-                const shortLink = data.data.tiny_url; // Adjust according to the API response format
-
-                // Display the short and long URLs
-                shortLinkDiv.innerHTML = `
-                    <p>Short link: <a href="${urlLink}" target="_blank" class="shortLink"><p>Select and Ctrl+C to Copy </p><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJlc9oUG3jFhzRKbAfjD3aRRJoZEwGO80I8Q&s" alt="${urlLink}" width="50px" height="50px"></a></p>
-                    <p>Long link: <a href="${urlLink}" target="_blank" class="shortLink">${urlLink}</a></p>
-                `;
-            } catch (error) {
-                errorDiv.textContent = 'Failed to shorten URL. Please try again.';
-                console.error('Error:', error);
-            }
+    <script>function getLink() {
+        const urlLink = document.getElementById('urlLink').value;
+        
+        if (!urlLink) {
+            alert("Please enter a URL.");
+            return;
         }
+        
+        const randomNum = Math.floor(Math.random() * 100000); // Generate a random number between 0 and 999
+        // Create a pseudo-shortened URL for demonstration purposes
+        const newLink = `https://short.link/${randomNum}`;
+        
+        // Update the DOM to display the new short link
+        document.getElementById('shortLink').innerHTML = `<a href="${urlLink}" target="_blank">Visit the original URL: ${urlLink}</a><br><br>Shortened URL: <a href="${urlLink}" target="_blank">${newLink}</a>`;
+    }
     </script>
 </body>
 </html>
