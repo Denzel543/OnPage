@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Log in to Schedugraph</title>
+        <style>
+            body {
+                background-color: skyblue;
+            }
+            input {
+                border-radius: 8px;
+                padding: 8px;
+                border: 1px solid black;
+            }
+            #login {
+                border-radius: 8px;
+                padding: 8px;
+                border: 1px solid black;
+                background-color: green;
+                color: white;
+                width: 150px;
+            }
+            #login:hover {
+                background-color: rgb(37, 110, 37);
+                color: black;
+                box-shadow: 0, 0, 0, black;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <center>
+                <h1>Login to ScheduGraph</h1>
+            </center>
+            <div>
+                <center>
+                    <label for="username">Username: </label><input type="text" id="username" name="username" autocomplete="nickname" placeholder=""/><br><br>
+                    <label for="password">Password: </label><input type="password" id="password" name="password" autocomplete="password" placeholder=""/><br><br>
+                    <button id="login">Login</button>
+                </center>
+            </div>
+        </div>
+    </body>
+</html>

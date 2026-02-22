@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like it.</title>
+    <style>
+        button {
+            color: red;
+            border: 0px;
+            background-color: rgba(255, 255, 255, 0);
+            font-size: 2.5rem;
+        }
+        button:hover {
+            color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <h1><img src="https://lh3.googleusercontent.com/a-/ALV-UjXi8sRgsoOfyQ5zHYf-fJLdkgnP_xL0Ksesk4QhPwqGFCiPqvM=s40-p">Like!</h1>
+    <button onclick="likes()" id="click">&hearts;</button><button id="click2"></button>
+    <div style="border: 1px solid black; padding: 10px; border-radius: 5px;">&hearts;: <span id="likes">0</span></div>
+    <script>
+        // localStorage.setItem("likes", 0);
+        document.getElementById('likes').innerHTML = localStorage.getItem("likes");
+
+        function likes() {
+            let currentLikes = parseInt(localStorage.getItem("likes"));
+            currentLikes += 1;
+            localStorage.setItem("likes", currentLikes);
+            document.getElementById('likes').innerHTML = currentLikes;
+
+            document.getElementById('click').innerHTML = '';
+            document.getElementById('click2').innerHTML = '&hearts;';
+        }
+    </script>
+</body>
+</html>

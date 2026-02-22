@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        span {
+            padding: 5px;
+        }
+        #message {
+            border-right: 0px;
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            border-bottom: 1px solid black;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            padding: 5px;
+            max-width: 400px;
+        }
+        button {
+            border-left: 0px;
+            border-top: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            background-color: green;
+            color: white;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex;"><span>Send message: </span><input style="width: 500px; height: 20px; border: 1px solid black;" id="message" oninput="able()"/>
+    <button onclick="send()" id="sent" disabled>Send</button></div>
+    <span></span><div id="reply"></div>
+
+    <script>
+        const names = [
+    "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Jason", "Condolezza","Denzel",
+    "Aarav", "Aditi", "Vivaan", "Ananya", "Rohan", "Priya",
+    "Wei", "Mei", "Xiao", "Li", "Wen", "Zhi",
+    "Chinwe", "Ifeanyi", "Ngozi", "Chinedu", "Amaka", "Obi", "Olamide", "Inioluwa", "Iyebiye", "Eniiyi", "Tosin",
+    "Lucas", "Maria", "João", "Ana", "Pedro", "Carla",
+    "Ivan", "Olga", "Dmitry", "Anna", "Sergey", "Svetlana",
+    "Haruto", "Yui", "Souta", "Aoi", "Ren", "Sakura",
+    "Lucas", "Emma", "Louis", "Chloé", "Gabriel", "Léa"
+        ];
+
+console.log(names);
+
+        const reply = document.getElementById('reply');
+        function able() {
+            let SEND = document.getElementById('sent')
+            SEND.removeAttribute('disabled')
+        }
+        function send() {
+            const sentence = document.getElementById('message').value;
+            const words = sentence.split(" " || "," || "." || "!" || "?" || ";");
+            console.log(words)
+            if (words.includes("name")) {
+                if (words.at(-1) == "name") {
+                    let name = words.at(-1)
+                    reply.innerHTML += `<br><br>You: ${sentence}<br>ChatBot: Please re-write the sentence in a different way.`;
+                } else {
+                    reply.innerHTML += `<br><br>You: ${sentence}<br>ChatBot: Hi ${words.at(-1)}!`;
+                }
+            }
+            if (words.includes("age")) {
+                if (words.at(-1) == "age") {
+                    let age = words.at(-1)
+                    reply.innerHTML += `<br><br>You: ${sentence}<br>ChatBot: Please re-write the sentence in a different way.`;
+                } else {
+                    reply.innerHTML += `<br><br>You: ${sentence}<br>ChatBot: This shows you are ${words.at(-1)} years old!`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

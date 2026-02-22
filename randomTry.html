@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Generator</title>
+    <style>
+        input {
+            max-width: 50px;
+        }
+        #result {
+            border: 1px solid black;
+            padding: 12px;
+            border-radius: 16px;
+            max-width: 555px;
+            box-shadow: 0px 0px 12px black;
+            margin: 1%;
+        }
+    </style>
+</head>
+<body>
+    <p>Generate <input type="number" id="amount" value="100"> random integers.</p>
+    <p>Between a value of <input type="number" id="min" value="0"> and <input type="number" id="max" value="100">.</p>
+    <p>Format in <input type="number" id="cols" value="10">.</p>
+    <button onclick="getRNDNum()">Generate</button>
+    <div id="result"></div><div class="by">By <code>DENZEL.ORG</code><code id="errorNone"></code></div>
+    <script>
+        result = document.getElementById('result');
+        function getRNDNum() {
+            let amount = parseInt(document.getElementById('amount').value);
+            let min = parseInt(document.getElementById('min').value);
+            let max = parseInt(document.getElementById('max').value);
+            let cols = parseInt(document.getElementById('cols').value);
+            let output = '';
+            if (min > max) {
+                result.style.boxShadow='0px 0px 12px red'
+                document.getElementById('errorNone').innerHTML=': Error. Minimum number must be smaller than maximium.'
+            } 
+            else if (!min) {
+                result.style.boxShadow='0px 0px 12px red'
+                document.getElementById('errorNone').innerHTML=': Error. You must have a minimum number.'
+            } else if (!max) {
+                result.style.boxShadow='0px 0px 12px red'
+                document.getElementById('errorNone').innerHTML=': Error. You must have a maximum number.'
+            } else {
+                result.style.boxShadow='0px 0px 12px black'
+                document.getElementById('errorNone').innerHTML+=''
+                document.getElementById('errorNone').innerHTML=''
+                for (let i = 0; i < amount; i++) {
+                    let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+                    output += randomNum;
+                    if (i < amount - 1) output += ', ';
+
+                    if ((i + 1) % cols === 0) output += '<br>';
+                }
+
+                document.getElementById('result').innerHTML = output;
+                }
+            }
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #searchBar {
+            width: 500px;
+            height: 20px;
+            max-height: 20px;
+            max-width: 500px;
+            border: 1px solid black;
+            border-radius: 5px;
+            padding: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="searchBar" contenteditable="true" oninput="checkLength()"></div>
+    <div id="error"></div>
+    <script>
+        searchAbility = document.getElementById('searchBar')
+        searchError = document.getElementById('error')
+        searchFunction = document.getElementById('searchBar')
+        function checkLength() {
+            searchLength = document.getElementById('searchBar').textContent.length;
+            if (searchLength > 60) {
+                searchAbility.contentEditable='false';
+                searchAbility.title='You have reached max words.';
+                searchAbility.contentEditable='true';
+                searchError.textContent='You have reached max words.';
+                searchFunction.style.border='2px solid red';
+                searchError.style.borderBottom='1px solid red'
+                searchError.style.borderLeft='1px solid red';
+            } else {
+                searchAbility.contentEditable='true';
+                searchAbility.title='';
+                searchError.textContent='';
+                searchFunction.style.border='1px solid black';
+            };
+        };
+    </script>
+</body>
+</html>

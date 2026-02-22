@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        body {
+            margin-top: 10%;
+        }
+        #contactForm {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            background-color: rgba(6, 4, 4, 0.615);
+            color: white;
+        }
+        button {
+            border: 1px solid black;
+            background-color: green;
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body onload="document.cookie = `,HG9FG;)9A>A):+b2)@bG>A@>=J>26)>b);2AF6=J>26===`">
+    <form id="contactForm">
+        <div>
+            <h1 style="text-align: center;">Contact Us</h1>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name">
+            <br>
+            <br>
+            <label for="email">Email: </label>
+            <input type="email" name="email" id="email">
+            <br>
+            <br>
+            <label for="message">Message: </label>
+            <textarea name="message" id="message" rows="12" cols="40"></textarea>
+            <br>
+            <br>
+            <button type="submit" onclick="saveData()">Send</button>
+        </div>
+    </form>
+    <script src="contact.js"></script>
+</body>
+</html>

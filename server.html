@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money</title>
+</head>
+<body onload="document.getElementById('money').innerText=localStorage['money']">
+    <h1>Money: $<b id="money"></b></h1>
+    <button onclick="localStorage['money'] = parseInt(localStorage['money'])+1; document.getElementById('money').innerText=localStorage['money']">+ 1 money / <small>Updates money incase you bought anything.</small></button><br>
+    <h1>Shop:</h1>
+    <button onclick="if (localStorage['money'] > 50) {localStorage['money'] = parseInt(localStorage['money']) - 50; setInterval(() => {
+    localStorage['money'] = parseInt(localStorage['money'])+1
+    alert('You got another $1.')
+    }, 5000);}">Click per 5 secs: $50. <small>One time-use. Reloading wears it off.</small></button>
+    <script type="text/javascript" src="./server.js"></script>
+</body>
+</html>

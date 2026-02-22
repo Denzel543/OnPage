@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get your Password</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+    .login-container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    input { padding: 8px; margin: 10px 0; width: 100%; }
+    button { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Get your Password</h2>
+  <input type="email" id="username" placeholder="Email" oninput="authenticate()" autocomplete="email">
+  <p id="status"></p>
+  <sub>* It could take a few minutes or hours.</sub>
+</div>
+
+<script>
+  const characters = 'abcdefghijklmnopqrstuvwxyz!?1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  
+  function authenticate() {
+    const usernames = ["denzelbabajide@gmail.com", "31babajidi@student.hpts.us"];
+    const passwords = {
+        'denzelbabajide@gmail.com': 'ALP75ear',
+        '31babajidi@student.hpts.us': 'Inioluwa1!?',
+    };
+
+    const username = document.getElementById("username").value;
+    const status = document.getElementById("status");
+
+    if (!username) {
+      status.textContent = '';
+      return;
+    }
+    
+    if (usernames.includes(username)) {
+      status.style.color = 'green'
+      status.textContent = "Loading...";
+      let guessedPassword = "";
+      const targetPassword = passwords[username];
+
+      let simulateGuessing = setInterval(() => {
+        guessedPassword = Array.from({ length: targetPassword.length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        console.log(guessedPassword)
+        
+        if (guessedPassword === targetPassword) {
+          status.textContent = `Password found: ${guessedPassword}`;
+          status.style.color = "green";
+          clearInterval(simulateGuessing);
+        }
+      }, 100);
+    } else {
+      status.textContent = "Email not recognized.";
+      status.style.color = "red";
+    }
+  }
+</script>
+
+</body>
+</html>

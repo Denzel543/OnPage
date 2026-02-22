@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Google Docs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+    .editor-container {
+      width: 80%;
+      max-width: 900px;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      display: block;
+    }
+    .toolbar {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    button {
+      margin-right: 10px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .editor {
+      min-height: 400px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      outline: none;
+    }
+    .saved-docs {
+      margin-top: 20px;
+    }
+    .saved-docs div {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="editor-container">
+    <div class="toolbar">
+      <img src="https://www.gstatic.com/images/branding/product/1x/docs_2020q4_48dp.png"><h1>Google Docs</h1>
+      <br>
+      <button onclick="document.execCommand('bold')"><b>B</b></button>
+      <button onclick="document.execCommand('italic')"><i>I</i></button>
+      <button onclick="document.execCommand('underline')"><u>U</u></button>
+      <button onclick="document.execCommand('insertUnorderedList')">Bullet List</button>
+      <button onclick="view()">View</button>
+      <button onclick="edit()">Edit</button>
+      <button onclick="document.execCommand('createLink', true, prompt('Enter URL:'))">Add Link</button>
+      <button onclick="saveDocument()">Save</button>
+    </div>
+    <div id="readOnly"></div>
+    <div id="editor" class="editor" contenteditable="true"></div>
+
+    <div class="saved-docs" id="saved-docs"></div>
+  </div>
+
+  <script>
+    function view() {
+      document.getElementById('editor').contentEditable='false'
+      document.getElementById('editor').title='This is a read only file'
+      document.getElementById('readOnly').innerHTML='<p style="background-color: grey; color: white; border: 3px solid darkblue; padding: 5px; text-align: center;">This is a read-only file</p>'
+    }
+    function edit() {
+      document.getElementById('editor').contentEditable='true'
+      document.getElementById('editor').title=''
+      document.getElementById('readOnly').innerHTML=''
+    }
+    function saveDocument() {
+      const docName = prompt('Enter a name for your document:');
+      if (!docName) {
+        alert('Document name is required!');
+        return;
+      }
+
+      const content = document.getElementById('editor').innerHTML;
+      localStorage.setItem(docName, content);
+      alert(`Your document "${docName}" has been saved`);
+
+      // Update the list of saved documents
+      loadSavedDocs();
+    }
+
+    function loadDocument(docName) {
+      const savedContent = localStorage.getItem(docName);
+      if (savedContent) {
+        document.getElementById('editor').innerHTML = savedContent;
+        alert(`Your document "${docName}" is loaded`);
+      } else {
+        alert(`No saved document found with the name "${docName}"!`);
+      }
+    }
+
+    function deleteDocument(docName) {
+      if (confirm(`Are you sure you want to delete "${docName}"?`)) {
+        localStorage.removeItem(docName);
+        alert(`Document "${docName}" has been deleted`);
+        loadSavedDocs(); // Refresh the list of saved documents
+      }
+    }
+
+    function loadSavedDocs() {
+      const savedDocsDiv = document.getElementById('saved-docs');
+      savedDocsDiv.innerHTML = ''; // Clear the list
+
+      // Loop through localStorage to find all saved documents
+      for (let i = 0; i < localStorage.length; i++) {
+        const docName = localStorage.key(i);
+        const docDiv = document.createElement('div');
+
+        const loadButton = document.createElement('button');
+        loadButton.textContent = `Load "${docName}"`;
+        loadButton.onclick = function() {
+          loadDocument(docName);
+        };
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.style.backgroundColor='red'
+        deleteButton.style.border='1px solid black'
+        deleteButton.onclick = function() {
+          deleteDocument(docName);
+        };
+
+        docDiv.appendChild(loadButton);
+        docDiv.appendChild(deleteButton);
+        savedDocsDiv.appendChild(docDiv);
+      }
+    }
+
+    // Load saved documents on page load
+    window.onload = loadSavedDocs;
+  </script>
+
+</body>
+</html>

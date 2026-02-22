@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Script Structurer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="checkStory()">
+    <div id="webApp">
+        <h1>SSS - Story Script Structurer</h1>
+        <div id="storyPage">
+            <center>
+                <label for="story">Paste Story Here: </label>
+                <input type="text" id="story" name="story" oninput="checkStory()"><button disabled="true" id="convertBtn" onclick="convertStorytoScript()">Convert</button>
+            </center>
+            <center>
+                <div id="scriptOutput" style="width: 500px;">
+                    <span id="output"><center>You'll see the script for the story here.</center></span>
+                </div>
+            </center>
+        </div>
+    </div>
+    <script src="src.js"></script>
+</body>
+</html>

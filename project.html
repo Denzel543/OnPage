@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="1.jpg" type="image/x-icon">
+    <title>ScheduGraph</title>
+    <style>
+        /* General Reset and Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #f7f9fc;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        #header {
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #header p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-left: 15px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        #header p:hover {
+            color: #f9f871;
+        }
+
+        /* Button Styling */
+        .create-account {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .create-account:hover {
+            background-color: #ff4757;
+            transform: scale(1.05);
+        }
+
+        /* Form Styles */
+        #accountForm {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        #accountForm p {
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        /* Page Layout */
+        #page {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        #help-bar {
+            width: 30%;
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #get-started-notes {
+            width: 60%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Links */
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #2e7d32;
+            text-decoration: underline;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        footer span {
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            #page {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #help-bar, #get-started-notes {
+                width: 90%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <p><img src="1.jpg" width="50" height="50"></p>
+        <p>Home</p>
+        <p>Create Account</p>
+    </header>
+
+    <div id="page">
+        <div id="help-bar">
+            <h1><i>📊 Let's get started.</i></h1>
+            <p><code>Get organized today with ScheduGraph.</code></p>
+            <button class="create-account" onclick="createAccount()">+ Create Account</button>
+
+            <div id="accountForm" style="text-align: center;"></div>
+        </div>
+
+        <div id="get-started-notes">
+            <h1>Documentation</h1>
+            <h2 id="how-to-get-started">How to get started.</h2>
+            <p>ScheduGraph helps you save and organize notes, links, and tasks.</p>
+            <ol>
+                <li id="step1">Go to the left-hand bar.</li>
+                <li id="step2">Fill in your details and start saving.</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <span>&copy; ScheduGraph. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function createAccount() {
+            let accountForm = document.getElementById('accountForm');
+            accountForm.innerHTML = `
+                <div style="position: relative;">
+                    <p>* Username:
+                        <label for="username"></label>
+                        <input type='text' id='username' placeholder='Enter Name:' size='40'>
+                    </p>
+                    <p>* Password:
+                        <label for="password"></label>
+                        <input type='password' id='password'>
+                        <button aria-label="Toggle password visibility" onclick="showHide()">👁️</button>
+                    </p>
+                    <p>* Gender:
+                        <input type='radio' name='gender' value='Male' id='male'> <label for='male'>Male</label>
+                        <input type='radio' name='gender' value='Female' id='female'> <label for='female'>Female</label>
+                    </p>
+                    <p>
+                        <button onclick="registerAccount()">Create Account</button>
+                    </p>
+                </div>
+            `;
+        }
+
+        function showHide() {
+            let password = document.getElementById('password');
+            password.type = password.type === "password" ? "text" : "password";
+        }
+
+        function registerAccount() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+            if (!username || !password || !gender) {
+                alert("Please fill all required fields.");
+                return;
+            }
+
+            // Retrieve users from localStorage
+            let users = JSON.parse(localStorage.getItem('users'));
+            console.log(users)
+            if (users.some(user => user.username === username)) {
+                alert("Username already exists! Please choose another.");
+                return;
+            }
+
+            users.push({ username, password, gender });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            localStorage.setItem('currentUser', username); // Track the logged-in user
+            window.location.replace('account.html');
+        }
+    </script>
+</body>
+</html>

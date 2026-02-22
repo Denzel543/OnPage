@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.I</title>
+    <style>
+        #ai1, #ai2, #ai3, #ai4 {
+            border: 0px;
+            border-radius: 50%;
+            padding: 0px;
+            margin: 0px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body onload="setTimeout(() => { document. location. reload(); }, 1000);">
+    <button id="ai1" onclick="">😎</button>
+    <button id="ai2" onclick="">😊</button>
+    <button id="ai3" onclick="">😐</button>
+    <div style="background-color: green;">.</div>
+    <script>
+        let max = 600
+        let min = 0
+        let ai1 = document.getElementById('ai1')
+        let ai2 = document.getElementById('ai2')
+        let ai3 = document.getElementById('ai3')
+        ai1.style.marginLeft=`${Math.random() * (max - min) - min}px`
+        ai2.style.marginLeft=`${Math.random() * (max - min) - min}px`
+        ai3.style.marginLeft=`${Math.random() * (max - min) - min}px`
+    </script>
+</body>
+</html>

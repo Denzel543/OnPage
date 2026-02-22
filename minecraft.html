@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloxMine</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simplex-noise@2.4.0/simplex-noise.min.js"></script>
+
+  <script>
+    // Scene, Camera, and Renderer
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB); // Light blue sky color
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.y = 2; // Player starts slightly above the ground
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Add light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    // Noise generator for terrain
+    const noise = new SimplexNoise();
+
+    // Terrain generation settings
+    const chunkSize = 10; // Each chunk is 10x10 blocks
+    const blockSize = 1; // Size of each block
+    const heightScale = 5; // Scale of hills and valleys
+
+    const materialDirt = new THREE.MeshLambertMaterial({ color: 0x8b4513 });  // Dirt color
+    const materialGrass = new THREE.MeshLambertMaterial({ color: 0x228B22 }); // Grass color
+    const materialStone = new THREE.MeshLambertMaterial({ color: 0x808080 }); // Stone color
+
+    // Border (outline) material
+    const borderMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });  // Black color for the edges
+
+    const loadedChunks = new Set();
+    const blockMap = new Map(); // To track blocks for breaking/adding
+
+    // Function to create a block with an outline and store it
+    function createBlockWithBorder(x, y, z, material) {
+      const block = new THREE.Mesh(new THREE.BoxGeometry(blockSize, blockSize, blockSize), material);
+      block.position.set(x, y, z);
+      scene.add(block);
+
+      const edges = new THREE.EdgesGeometry(block.geometry);
+      const line = new THREE.LineSegments(edges, borderMaterial);
+      line.position.set(x, y, z);
+      scene.add(line);
+
+      // Store block in block map for interaction
+      const key = `${x},${y},${z}`;
+      blockMap.set(key, { block, line });
+    }
+
+    // Terrain generation with hills and valleys
+    function getHeight(x, z) {
+      return Math.floor(noise.noise2D(x / 20, z / 20) * heightScale); // Adjust scale for smooth terrain
+    }
+
+    function createChunk(xOffset, zOffset) {
+      const chunk = new THREE.Group(); // Group blocks into chunks
+      for (let x = 0; x < chunkSize; x++) {
+        for (let z = 0; z < chunkSize; z++) {
+          const worldX = x + xOffset;
+          const worldZ = z + zOffset;
+          const height = getHeight(worldX, worldZ);
+
+          for (let y = 0; y <= height; y++) {
+            let material = y === height ? materialGrass : materialDirt; // Grass on top, dirt below
+            if (y < height - 3) material = materialStone; // Stone below certain depth
+            createBlockWithBorder(worldX, y, worldZ, material);
+          }
+        }
+      }
+      scene.add(chunk);
+    }
+
+    // Generate chunks around the player
+    function generateChunksAroundPlayer() {
+      const playerX = Math.floor(camera.position.x / chunkSize) * chunkSize;
+      const playerZ = Math.floor(camera.position.z / chunkSize) * chunkSize;
+
+      for (let xOffset = -1; xOffset <= 1; xOffset++) {
+        for (let zOffset = -1; zOffset <= 1; zOffset++) {
+          const chunkKey = `${playerX + xOffset * chunkSize},${playerZ + zOffset * chunkSize}`;
+          if (!loadedChunks.has(chunkKey)) {
+            createChunk(playerX + xOffset * chunkSize, playerZ + zOffset * chunkSize);
+            loadedChunks.add(chunkKey);
+          }
+        }
+      }
+    }
+
+    // Raycaster for block interaction (breaking/adding)
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function onMouseClick(event, action) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects([...blockMap.values()].map(item => item.block));
+
+      if (intersects.length > 0) {
+        const intersected = intersects[0];
+        const blockPosition = intersected.object.position;
+
+        if (action === 'break') {
+          removeBlock(blockPosition.x, blockPosition.y, blockPosition.z);
+        } else if (action === 'add') {
+          addBlockNextTo(intersected);
+        }
+      }
+    }
+
+    // Remove block
+    function removeBlock(x, y, z) {
+      const key = `${x},${y},${z}`;
+      if (blockMap.has(key)) {
+        const { block, line } = blockMap.get(key);
+        scene.remove(block);
+        scene.remove(line);
+        blockMap.delete(key);
+      }
+    }
+
+    // Add block next to clicked block
+    function addBlockNextTo(intersection) {
+      const normal = intersection.face.normal.clone();
+      const newBlockPosition = intersection.point.clone().addScaledVector(normal, blockSize).floor();
+      const { x, y, z } = newBlockPosition;
+      const key = `${x},${y},${z}`;
+
+      if (!blockMap.has(key)) {
+        createBlockWithBorder(x, y, z, materialGrass); // New block is grass for now
+      }
+    }
+
+    // Event listeners for block breaking and adding
+    window.addEventListener('click', (event) => onMouseClick(event, 'break'));  // Left-click to break
+    window.addEventListener('contextmenu', (event) => {
+      event.preventDefault(); 
+      onMouseClick(event, 'add');  // Right-click to add
+    });
+
+    // Player movement controls
+    const moveSpeed = 0.2;
+    const keysPressed = {};
+
+    window.addEventListener('keydown', (event) => { keysPressed[event.key] = true; });
+    window.addEventListener('keyup', (event) => { keysPressed[event.key] = false; });
+
+    function handlePlayerMovement() {
+      if (keysPressed['w']) {
+        camera.position.z -= moveSpeed * Math.cos(camera.rotation.y);
+        camera.position.x -= moveSpeed * Math.sin(camera.rotation.y);
+      }
+      if (keysPressed['s']) {
+        camera.position.z += moveSpeed * Math.cos(camera.rotation.y);
+        camera.position.x += moveSpeed * Math.sin(camera.rotation.y);
+      }
+      if (keysPressed['a']) {
+        camera.position.x -= moveSpeed * Math.cos(camera.rotation.y);
+        camera.position.z += moveSpeed * Math.sin(camera.rotation.y);
+      }
+      if (keysPressed['d']) {
+        camera.position.x += moveSpeed * Math.cos(camera.rotation.y);
+        camera.position.z -= moveSpeed * Math.sin(camera.rotation.y);
+      }
+
+      // Jump (space)
+      if (keysPressed[' ']) {
+        if (isOnGround) { // Jump only if player is on the ground
+          velocityY = 0.3;
+          isOnGround = false;
+        }
+      }
+    }
+
+    // Variables for gravity
+    let velocityY = 0;
+    let gravity = -0.01;
+    let isOnGround = false;
+
+    // Gravity and collision detection
+    function applyGravity() {
+      velocityY += gravity; // Apply gravity
+      camera.position.y += velocityY;
+
+      // Detect if the player is on the ground
+      const playerX = Math.floor(camera.position.x);
+      const playerZ = Math.floor(camera.position.z);
+      const playerY = Math.floor(camera.position.y);
+
+      const blockBelowKey = `${playerX},${playerY - 1},${playerZ}`;
+      if (blockMap.has(blockBelowKey)) {
+        // Stop falling when hitting the ground
+        isOnGround = true;
+        velocityY = 0;
+        camera.position.y = playerY + 1; // Align player with the block
+      } else {
+        isOnGround = false; // Free fall
+      }
+    }
+
+    // Mouse controls for camera rotation
+    let isMouseDown = false;
+    window.addEventListener('mousedown', () => { isMouseDown = true; });
+    window.addEventListener('mouseup', () => { isMouseDown = false; });
+    window.addEventListener('mousemove', (event) => {
+      if (isMouseDown) {
+        camera.rotation.y -= event.movementX * 0.002;
+        camera.rotation.x -= event.movementY * 0.002;
+        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+      }
+    });
+
+    // Game loop
+    function animate() {
+      requestAnimationFrame(animate);
+      handlePlayerMovement();
+      applyGravity();
+      generateChunksAroundPlayer();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get the code</title>
+    <style>
+        body {
+            font-family: monospace;
+        }
+        input {
+            font-family: monospace;
+            border-right: 0px;
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            border-bottom: 1px solid black;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            padding: 5px;
+            max-width: 400px;
+        }
+        button {
+            font-family: monospace;
+            border-left: 0px;
+            border-top: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            background-color: white;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Type the code to get a link to an html project</h1>
+    <code><label>The code hint is a random number from (1 - 10): </label><input type="text" id="code" placeholder=""><button onclick="ans()">&rightarrow;</button></code>
+    <div id="answer"></div>
+    <script>
+        function ans() {
+            let CODE = String(Math.floor(Math.random() * 10 - 1 + 1))
+            let code = document.getElementById('code').value;
+            if (code == CODE) {
+                document.getElementById('answer').innerHTML='This is correct! 🔓 Here is your link: <a href="./minecraft.html" target="_blank">Go to link</a>'
+            } else {
+                document.getElementById('answer').innerHTML='Incorrect. 🔒 Changing code<span id="move">...</span>'
+                let CODE = String(Math.floor(Math.random() * 10 - 1 + 1))
+            }
+        }
+    </script>
+</body>
+</html>

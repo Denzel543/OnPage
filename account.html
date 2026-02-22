@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Account - ScheduGraph</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="header">
+        <p>Welcome, <span id="usernameDisplay"></span>!</p>
+        <button onclick="logout()">Logout</button>
+    </header>
+
+    <div id="content">
+        <h2>Your Dashboard</h2>
+        <p>Here you can manage your tasks and notes.</p>
+    </div>
+
+    <footer>
+        <span>&copy; ScheduGraph. All rights reserved.</span>
+    </footer>
+
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+
+        const user = users.find(u => u.username === currentUser);
+
+        if (!user) {
+            alert("User not found! Redirecting to login.");
+            window.location.replace('project.html');
+        } else {
+            document.getElementById('usernameDisplay').innerText = user.username;
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.replace('project.html');
+        }
+    </script>
+</body>
+</html>

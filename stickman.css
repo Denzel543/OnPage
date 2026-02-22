@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background: #fafafa;
+  padding: 40px;
+  position: relative;
+}
+
+h1, p { margin: 24px 0; }
+
+/* Kodex AI sidebar styles (if present) */
+#kodex-ai-sidebar { transition: width 0.18s ease; }
+#kodex-ai-sidebar.collapsed { width: 40px !important; }
+
+.ai-box { font-size: 13px; color: #222; }

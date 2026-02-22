@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stickman AI Demo</title>
+<style>
+body { font-family: sans-serif; margin: 50px; line-height: 1.5; }
+button { margin: 5px; padding: 5px 10px; }
+p { margin: 20px 0; }
+a { color: blue; text-decoration: underline; }
+hr { margin: 30px 0; }
+</style>
+</head>
+<body>
+
+<h1>Stickman AI Demo</h1>
+
+<p>Welcome<br/> to the Stickman AI demo. The stickman will walk only on text platforms.</p>
+
+<p>Here is a <a href="./templates/index.html">link to Page 1</a> and another <a href="https://example.com/page2.html">link to Page 2</a>.</p>
+
+<p>Stickmen can also jump down to lower text platforms if they exist.</p>
+
+<hr>
+
+<p>Try creating a new stickman and assigning tasks:</p>
+
+<button onclick="StickmanAI.bringOut('sm_2')">Bring out sm_2</button>
+<button onclick="StickmanAI.assignTask('sm_2', {type:'read'})">Read/Summarize Page</button>
+<button onclick="StickmanAI.assignTask('sm_2', {type:'visitLink'})">Visit Link</button>
+<button onclick="StickmanAI.store('sm_2')">Store sm_2</button>
+<button onclick="StickmanAI.createNew(`sm_${Math.floor(Math.random() * 100) + 1}`)">Create Stickman</button>
+<button onclick="console.log('Slots:', StickmanAI.listSlots())">List Slots</button>
+
+<hr>
+
+<p>Another paragraph with a <a href="file:///C:/Users/tosba/OneDrive/Documents/Projects/frenchtutor.html">link to Page 3</a>.</p>
+<p>And some more text here for platforms.</p>
+<p>Final paragraph for testing jumps and drops.</p>
+<p>Hi, I’m Claude. How can I help you today?
+
+Yes, yes. What can I do for you?
+
+Are you still doing that?
+
+Alright, alright, you have my attention!
+
+Ugh, well you can’t do that forever</p>
+
+<script src="/static/assistant.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application</title>
+    <style>
+        input {
+            border-radius: 16px;
+            padding: 10px;
+            border: 1px solid lightgrey;
+            margin-top: 5px;
+        }
+        input:focus {
+            border: 1px solid black;
+        }
+        fieldset {
+            margin-top: 12px;
+        }
+        #send {
+            background-color: green;
+            color: white;
+            padding: 10px;
+            margin-top: 12px;
+            border-radius: 16px;
+            border: 1px solid grey;
+        }
+        #send:hover {
+            border: 1px solid black;
+        }    
+        #gender {
+            border: 1px solid black;
+            border-radius: 16px;
+            padding: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Job Application</h1>
+    <p><i>Please answer the questions with <b style="color: red;">*</b></i></p>
+    <div id="readOnly"></div>
+    <fieldset id="jobForm">
+        <fieldset>
+            <legend><h1>Contact Details</h1></legend>
+            <label for="names"><b><i style="color: red;">*</i></b> Full Name:</label>
+            <input id="names" type="text" placeholder="Enter Your Full Name" required autofocus>
+            <br>
+            <label for="gender"><b><i style="color: red;">*</i></b> Gender: </label>
+            <select id="gender" required autofocus>
+                <option></option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+            <br>
+            <label for="email"><b><i style="color: red;">*</i></b> Your Email:</label>
+            <input type="email" id="email" placeholder="Enter Your Email" required autofocus>
+            <br>
+            <label for="phone">Phone Number:</label>
+            <input type="number" id="phone" placeholder="000-0000-0000" autofocus>
+        </fieldset>
+        <fieldset>
+            <legend><h1>Job Application</h1></legend>
+            <form>
+                <label for="job"><b><i style="color: red;">*</i></b> Job:</label>
+                <input type="text" id="job" placeholder="Enter the Job" required autofocus>
+                <br>
+                <label for="practice"><b><i style="color: red;">*</i></b> Study Area:</label>
+                <input type="text" id="practice" placeholder="Where you Studied the job" required autofocus>
+                <br>            
+                <label for="certificate">Certificate:</label>
+                <input type="file" id="certificate" placeholder="" autofocus>
+                <br>
+            </form>
+        </fieldset>
+        <button id="send" type="submit" onclick="sent()">Submit</button>
+        </fieldset>
+    <script>
+        function allow() {
+            const names = document.getElementById('names').value
+            const email = document.getElementById('email').value
+            const job = document.getElementById('job').value
+            const practice = document.getElementById('practice').value
+            if (!names) {
+                const btn = document.getElementById('send').onclick=''
+            }
+        }
+        function sent() {
+            const names = document.getElementById('names').readOnly=true
+            const email = document.getElementById('email').readOnly=true
+            const phone = document.getElementById('phone').readOnly=true
+            const job = document.getElementById('job').readOnly=true
+            const practice = document.getElementById('practice').readOnly=true
+            const certificate = document.getElementById('certificate').style.visibility='hidden'
+            const gender = document.getElementById('gender').style.visibility='hidden'
+            if (!names) {
+                console.alert('YOU NEED TO HAVE ALL MANDATORY FIELDS FILLED')
+            } else if (!email) {
+                console.alert('YOU NEED TO HAVE ALL MANDATORY FIELDS FILLED')
+            } 
+            else {
+                document.getElementById('jobForm').title='This is a read-only file. You cannot change any of the data.'
+                document.getElementById('readOnly').innerHTML='<p style="background-color: darkgrey; color: white; border: 3px solid darkblue; border-radius: 4px; padding: 10px;">This information is now a read only file. You cannot make any changes. Reloading the page will allow you to send another one.</p>'
+                document.getElementsByName('body').innerHTML+='<fieldset><legend>Thank you for Filling it up.</legend> You can now reload the page</fieldset>'
+            }
+        }
+    </script>
+</body>
+</html>

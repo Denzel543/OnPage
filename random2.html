@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integer Generator</title>
+    <style>
+        input {
+            max-width: 55px;
+        }
+        h2 {
+            color: rgb(294, 198, 160);
+            font-family: monospace;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="randomForm">
+        <h2>Part 1: The Integers</h2>
+        <p>Generate <input type="number" id="amount" value="100"> random integers (maximum 1,000).</p>
+        <p>Each integer should have a value between <input type="number" id="min" value="0"> and <input type="number" id="max" value="100"></p>
+        <p>Format in <input type="number" id="cols" value="5"> column(s).</p>
+        <h2>Part 2: Go!</h2>
+        <p>Be patient! It may take a little while to generate your numbers...</p>
+        <button onclick="getRNDNum()">Get Numbers</button>
+    </div>
+    <div id="result"></div>
+    <script src="random2.js"></script>
+</body>
+</html>

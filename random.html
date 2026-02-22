@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Generator</title>
+    <style>
+        .border {
+            border: 1px solid rgb(294, 198, 160);
+            max-width: 155px;
+            margin: 12px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            padding-bottom: 12px;
+        }
+        .title {
+            text-align: center;
+            align-items: center;
+            background-color: rgb(249, 198, 160);
+        }
+        label {
+            color: grey;
+            margin-left: 8px;
+        }
+        input {
+            max-width: 80px;
+            margin: 12px;
+        }
+        #result {
+            background-color: rgb(294, 198, 160);
+        }
+        span {
+            color: grey;
+        }
+        u:hover {
+            color: black;
+            cursor: pointer;
+        }
+        .by {
+            font-size: 0.52424rem;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div id="borderRandom" class="border">
+        <center style="background-color: rgb(294, 198, 160); position: relative;"><span class="title">Random Number Generator</span></center>
+        <label>Min:</label><input type="number" id="minNum" value="0"><br>
+        <label>Max:</label><input type="number" id="maxNum" value="100"><br>
+        <center><button onclick="generateRND()">Generate</button></center><br>
+        <span>Result: </span>
+        <div id="result"></div>
+        <span class="by">Powered By <u>DENZEL.ORG</u></span>
+    </div>
+    <script src="random.js"></script>
+</body>
+</html>

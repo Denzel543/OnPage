@@ -1,0 +1,3552 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      animation: gradientShift 15s ease infinite;
+      background-size: 200% 200%;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card-glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    .card-dark {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(20px);
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    .tab-active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .certificate-border {
+      border: 10px double #d4af37;
+      background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes confetti {
+      0% { transform: translateY(0) rotateZ(0); }
+      100% { transform: translateY(100vh) rotateZ(720deg); }
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      animation: confetti 3s linear forwards;
+    }
+    .floating-shapes {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .shape {
+      position: absolute;
+      opacity: 0.1;
+      animation: float 20s infinite ease-in-out;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-50px) rotate(180deg); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full gradient-bg overflow-auto"><!-- Floating Background Shapes -->
+  <div class="floating-shapes">
+   <div class="shape w-64 h-64 bg-white rounded-full" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+   <div class="shape w-48 h-48 bg-white rounded-full" style="top: 60%; right: 15%; animation-delay: 5s;"></div>
+   <div class="shape w-32 h-32 bg-white rounded-full" style="bottom: 20%; left: 50%; animation-delay: 10s;"></div>
+  </div>
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="card-glass rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Compliance Dashboard</h1>
+      <p class="text-gray-600 mb-8">Sign in or create an account</p>
+      
+      <div id="auth-form-container">
+        <!-- Sign In Form -->
+        <form id="signin-form" onsubmit="handleSignIn(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" id="signin-email" placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input type="password" id="signin-password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 rounded-lg transition-all">
+            Sign In
+          </button>
+        </form>
+        
+        <div class="my-4 text-center text-gray-500">or</div>
+        
+        <button onclick="toggleAuthForm()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-lg transition-all">
+          Create New Account
+        </button>
+      </div>
+      
+      <div id="signup-form-container" class="hidden space-y-4">
+        <!-- Sign Up Form -->
+        <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" id="signup-email" placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input type="password" id="signup-password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input type="password" id="signup-password-confirm" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 rounded-lg transition-all">
+            Create Account
+          </button>
+        </form>
+        
+        <button onclick="toggleAuthForm()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-lg transition-all">
+          Back to Sign In
+        </button>
+      </div>
+      
+      <p id="auth-error" class="text-red-500 text-sm mt-4 hidden"></p>
+    </div>
+  </div>
+
+  <div id="app" class="min-h-full p-4 md:p-6 lg:p-8 relative z-10 hidden"><!-- Header -->
+   <header class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+     <div>
+      <h1 id="app-title" class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Compliance Command Center</h1>
+      <div class="admin-content"><input type="text" id="org-name-input" value="Your Organization" placeholder="Enter organization name" class="bg-white/20 text-white placeholder-white/60 border-2 border-white/30 rounded-lg px-4 py-2 text-lg focus:outline-none focus:border-white/60 transition-all" oninput="debouncedUpdateOrgName(this.value)">
+      </div>
+      <p id="org-name" class="text-white/80 mt-2 text-lg employee-content hidden">Your Organization</p>
+     </div>
+     <div class="flex items-center gap-3 flex-wrap">
+      <div class="card-glass rounded-xl px-4 py-2"><select id="user-role-selector" onchange="switchUserRole(this.value)" class="bg-transparent text-gray-800 font-semibold focus:outline-none cursor-pointer"> <option value="admin">👨‍💼 Admin View</option> <option value="employee">👤 Employee View</option> </select>
+      </div>
+      <div id="employee-selector-container" class="card-glass rounded-xl px-4 py-2 hidden"><select id="employee-view-selector" onchange="changeEmployeeView(this.value)" class="bg-transparent text-gray-800 font-medium focus:outline-none cursor-pointer"> <option value="">Select employee...</option> </select>
+      </div><button onclick="toggleNotifications()" class="relative card-glass rounded-xl px-4 py-2 hover:bg-white transition-all">
+       <div class="flex items-center gap-2"><span>🔔</span> <span class="text-sm font-medium text-gray-800">Alerts</span> <span id="notification-badge" class="hidden bg-red-500 text-white text-xs rounded-full px-2 py-0.5">0</span>
+       </div></button><button onclick="handleLogout()" class="card-glass rounded-xl px-4 py-2 hover:bg-white transition-all">
+       <div class="flex items-center gap-2"><span>🚪</span> <span class="text-sm font-medium text-gray-800">Logout</span>
+       </div></button>
+      <div class="text-sm text-white/90 font-medium" id="current-date"></div>
+     </div>
+    </div>
+   </header><!-- Notification Panel -->
+   <div id="notification-panel" class="hidden fixed top-0 right-0 h-full w-full md:w-96 card-dark z-50 overflow-y-auto shadow-2xl">
+    <div class="p-6">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-white">Notifications</h3><button onclick="toggleNotifications()" class="text-gray-400 hover:text-white text-3xl">×</button>
+     </div>
+     <div class="space-y-3" id="notification-list">
+      <p class="text-gray-500 text-center py-8">No notifications</p>
+     </div>
+    </div>
+   </div><!-- Navigation Tabs -->
+   <nav class="mb-6">
+    <div class="flex flex-wrap gap-2 card-glass rounded-xl p-3 shadow-lg"><button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn admin-tab tab-active px-5 py-3 rounded-lg text-sm font-semibold transition-all"> 📊 Dashboard </button> <button onclick="switchTab('my-training')" id="tab-my-training" class="tab-btn employee-tab hidden px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 📚 My Training </button> <button onclick="switchTab('supervised-training')" id="tab-supervised-training" class="tab-btn supervisor-tab hidden px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 👁️ Supervised Training </button> <button onclick="switchTab('training')" id="tab-training" class="tab-btn admin-tab px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 📚 Training Management </button> <button onclick="switchTab('compliance')" id="tab-compliance" class="tab-btn admin-tab px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 🛡️ Compliance </button> <button onclick="switchTab('vendors')" id="tab-vendors" class="tab-btn admin-tab px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 🤝 Vendors </button> <button onclick="switchTab('employees')" id="tab-employees" class="tab-btn admin-tab px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 👥 Employees </button> <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn admin-tab px-5 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-all"> 📈 Reports </button>
+    </div>
+   </nav><!-- Dashboard Tab -->
+   <section id="section-dashboard" class="tab-content animate-fade-in"><!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 admin-content"><button onclick="switchTab('employees')" class="card-glass rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1 text-left">
+      <div class="flex items-center justify-between">
+       <div>
+        <p class="text-gray-600 text-sm font-medium mb-2">Total Employees</p>
+        <p id="stat-employees" class="text-4xl font-bold text-gray-900">0</p>
+        <p class="text-xs text-gray-500 mt-1"><span id="stat-departments">0</span> departments</p>
+       </div>
+       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl shadow-lg">
+        👥
+       </div>
+      </div></button> <button onclick="switchTab('training')" class="card-glass rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1 text-left">
+      <div class="flex items-center justify-between">
+       <div>
+        <p class="text-gray-600 text-sm font-medium mb-2">Training Completion</p>
+        <p id="stat-training" class="text-4xl font-bold text-green-600">0%</p>
+        <p class="text-xs text-gray-500 mt-1"><span id="stat-overdue">0</span> overdue</p>
+       </div>
+       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-3xl shadow-lg">
+        📚
+       </div>
+      </div></button> <button onclick="switchTab('compliance')" class="card-glass rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1 text-left">
+      <div class="flex items-center justify-between">
+       <div>
+        <p class="text-gray-600 text-sm font-medium mb-2">Compliance Score</p>
+        <p id="stat-compliance" class="text-4xl font-bold text-purple-600">0%</p>
+        <p class="text-xs text-gray-500 mt-1"><span id="stat-frameworks">0</span> frameworks</p>
+       </div>
+       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-3xl shadow-lg">
+        🛡️
+       </div>
+      </div></button> <button onclick="switchTab('vendors')" class="card-glass rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1 text-left">
+      <div class="flex items-center justify-between">
+       <div>
+        <p class="text-gray-600 text-sm font-medium mb-2">High Risk Vendors</p>
+        <p id="stat-vendor-risk" class="text-4xl font-bold text-orange-600">0</p>
+        <p class="text-xs text-gray-500 mt-1"><span id="stat-expiring">0</span> expiring certs</p>
+       </div>
+       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-3xl shadow-lg">
+        ⚠️
+       </div>
+      </div></button>
+    </div><!-- Framework Status -->
+    <div class="card-glass rounded-2xl p-8 shadow-lg mb-8 admin-content">
+     <h3 class="text-2xl font-bold text-gray-900 mb-6">🌐 Compliance Framework Status</h3>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><button onclick="filterComplianceByFramework('ISO 27001')" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-200 hover:border-blue-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">ISO 27001</h4><span id="iso-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="iso-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="iso-count">0</span> controls</p></button> <button onclick="filterComplianceByFramework('NIST')" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border-2 border-green-200 hover:border-green-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">NIST CSF</h4><span id="nist-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="nist-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="nist-count">0</span> controls</p></button> <button onclick="filterComplianceByFramework('SOC 2')" class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border-2 border-purple-200 hover:border-purple-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">SOC 2</h4><span id="soc2-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="soc2-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="soc2-count">0</span> controls</p></button> <button onclick="filterComplianceByFramework('GDPR')" class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-5 border-2 border-yellow-200 hover:border-yellow-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">GDPR</h4><span id="gdpr-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="gdpr-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="gdpr-count">0</span> controls</p></button> <button onclick="filterComplianceByFramework('HIPAA')" class="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-5 border-2 border-red-200 hover:border-red-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">HIPAA</h4><span id="hipaa-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="hipaa-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="hipaa-count">0</span> controls</p></button> <button onclick="filterComplianceByFramework('PCI DSS')" class="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border-2 border-teal-200 hover:border-teal-400 transition-all text-left">
+       <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-900 text-lg">PCI DSS</h4><span id="pci-status" class="text-3xl">⚪</span>
+       </div>
+       <div class="w-full bg-white rounded-full h-3 mb-2 shadow-inner">
+        <div id="pci-progress" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+       </div><p class="text-sm text-gray-700 font-medium"><span id="pci-count">0</span> controls</p></button>
+     </div>
+    </div><!-- Quick Actions -->
+    <div class="card-glass rounded-2xl p-8 shadow-lg admin-content">
+     <h3 class="text-2xl font-bold text-gray-900 mb-6">⚡ Quick Actions</h3>
+     <div class="grid grid-cols-2 md:grid-cols-4 gap-4"><button onclick="switchTab('employees'); setTimeout(() => showModal('add-employee-modal'), 100)" class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl p-6 text-left transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"> <span class="text-4xl mb-3 block">➕</span> <span class="font-bold text-white text-base">Add Employee</span> </button> <button onclick="switchTab('training'); showModal('assign-training-modal')" class="bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-xl p-6 text-left transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"> <span class="text-4xl mb-3 block">📚</span> <span class="font-bold text-white text-base">Assign Training</span> </button> <button onclick="switchTab('vendors'); showModal('add-vendor-modal')" class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl p-6 text-left transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"> <span class="text-4xl mb-3 block">🤝</span> <span class="font-bold text-white text-base">Add Vendor</span> </button> <button onclick="switchTab('reports')" class="bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl p-6 text-left transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"> <span class="text-4xl mb-3 block">📊</span> <span class="font-bold text-white text-base">View Reports</span> </button>
+     </div>
+    </div>
+   </section><!-- My Training Tab (Employee View) -->
+   <section id="section-my-training" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <h2 class="text-3xl font-bold text-gray-900 mb-6">📚 My Training Assignments</h2>
+     <div id="my-training-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No training assignments yet.</p>
+     </div>
+    </div>
+   </section><!-- Supervised Training Tab (Supervisor View) -->
+   <section id="section-supervised-training" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <h2 class="text-3xl font-bold text-gray-900 mb-6">👁️ Supervised Training Assignments</h2>
+     <p class="text-gray-600 mb-6">Training assignments where you are the designated supervisor</p>
+     <div id="supervised-training-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No supervised training assignments.</p>
+     </div>
+    </div>
+   </section><!-- Training Management Tab (Admin View) -->
+   <section id="section-training" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Training Management</h2><button onclick="showModal('assign-training-modal')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"> ➕ Assign Training </button>
+     </div>
+     <div id="training-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No training assignments yet.</p>
+     </div>
+    </div>
+   </section><!-- Compliance Tab -->
+   <section id="section-compliance" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Compliance Controls</h2><button onclick="showModal('add-control-modal')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"> ➕ Add Control </button>
+     </div>
+     <div id="controls-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No compliance controls yet.</p>
+     </div>
+    </div>
+   </section><!-- Vendors Tab -->
+   <section id="section-vendors" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Vendor Management</h2><button onclick="showModal('add-vendor-modal')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"> ➕ Add Vendor </button>
+     </div>
+     <div id="vendor-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No vendors added yet.</p>
+     </div>
+    </div>
+   </section><!-- Employees Tab -->
+   <section id="section-employees" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Employee Management</h2><button onclick="showModal('add-employee-modal')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"> ➕ Add Employee </button>
+     </div>
+     <div id="employee-list" class="space-y-4">
+      <p class="text-gray-500 text-center py-12 text-lg">No employees added yet.</p>
+     </div>
+    </div>
+   </section><!-- Reports Tab -->
+   <section id="section-reports" class="tab-content hidden">
+    <div class="card-glass rounded-2xl p-8 shadow-lg">
+     <h2 class="text-3xl font-bold text-gray-900 mb-6">📈 Analytics &amp; Reports</h2>
+     <div class="space-y-6"><!-- Training Report -->
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+       <div class="flex items-center justify-between mb-4">
+        <div>
+         <h3 class="text-xl font-bold text-gray-900">📄 Training Report</h3>
+         <p class="text-sm text-gray-600">All training assignments and completion status</p>
+        </div>
+       </div>
+       <div class="flex flex-wrap gap-2"><button onclick="exportReport('training', 'excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📊 Export Excel </button> <button onclick="exportReport('training', 'csv')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📋 Export CSV </button> <button onclick="exportReport('training', 'pdf')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📕 Export PDF </button> <button onclick="exportReport('training', 'txt')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📝 Export TXT </button>
+       </div>
+      </div><!-- Compliance Report -->
+      <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
+       <div class="flex items-center justify-between mb-4">
+        <div>
+         <h3 class="text-xl font-bold text-gray-900">🛡️ Compliance Report</h3>
+         <p class="text-sm text-gray-600">All compliance controls and status</p>
+        </div>
+       </div>
+       <div class="flex flex-wrap gap-2"><button onclick="exportReport('compliance', 'excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📊 Export Excel </button> <button onclick="exportReport('compliance', 'csv')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📋 Export CSV </button> <button onclick="exportReport('compliance', 'pdf')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📕 Export PDF </button> <button onclick="exportReport('compliance', 'txt')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📝 Export TXT </button>
+       </div>
+      </div><!-- Vendor Report -->
+      <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200">
+       <div class="flex items-center justify-between mb-4">
+        <div>
+         <h3 class="text-xl font-bold text-gray-900">📊 Vendor Report</h3>
+         <p class="text-sm text-gray-600">Vendor risk assessments and certifications</p>
+        </div>
+       </div>
+       <div class="flex flex-wrap gap-2"><button onclick="exportReport('vendors', 'excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📊 Export Excel </button> <button onclick="exportReport('vendors', 'csv')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📋 Export CSV </button> <button onclick="exportReport('vendors', 'pdf')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📕 Export PDF </button> <button onclick="exportReport('vendors', 'txt')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📝 Export TXT </button>
+       </div>
+      </div><!-- Full Report -->
+      <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200">
+       <div class="flex items-center justify-between mb-4">
+        <div>
+         <h3 class="text-xl font-bold text-gray-900">📑 Full System Report</h3>
+         <p class="text-sm text-gray-600">Complete report including all data</p>
+        </div>
+       </div>
+       <div class="flex flex-wrap gap-2"><button onclick="exportReport('full', 'excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📊 Export Excel </button> <button onclick="exportReport('full', 'csv')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📋 Export CSV </button> <button onclick="exportReport('full', 'pdf')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📕 Export PDF </button> <button onclick="exportReport('full', 'txt')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all"> 📝 Export TXT </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Training Content Modal -->
+   <div id="training-content-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-fade-in">
+     <div class="sticky top-0 bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
+      <h3 id="training-modal-title" class="text-2xl font-bold text-white">Training Content</h3><button onclick="closeTrainingContent()" class="text-white hover:text-gray-200 text-3xl font-bold">×</button>
+     </div>
+     <div class="p-8">
+      <div id="training-content-area" class="mb-8"><!-- Training content will be loaded here -->
+      </div>
+      <div class="flex justify-center"><button id="start-assessment-btn" onclick="startAssessment()" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"> Start Assessment 📝 </button>
+      </div>
+     </div>
+    </div>
+   </div><!-- Assessment Modal -->
+   <div id="assessment-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-fade-in">
+     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-t-2xl">
+      <h3 class="text-2xl font-bold text-white">📝 Training Assessment</h3>
+      <p class="text-white/90 mt-1">Pass mark: 100% (All questions must be correct)</p>
+     </div>
+     <div class="p-8">
+      <form id="assessment-form" onsubmit="submitAssessment(event)">
+       <div id="assessment-questions" class="space-y-6 mb-8"><!-- Questions will be loaded here -->
+       </div>
+       <div class="flex gap-4"><button type="button" onclick="hideModal('assessment-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="submit-assessment-btn" class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-bold transition-all">Submit Assessment</button>
+       </div>
+      </form>
+     </div>
+    </div>
+   </div><!-- Certificate Modal -->
+   <div id="certificate-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50 p-4">
+    <div class="certificate-border rounded-2xl w-full max-w-4xl p-12 animate-fade-in shadow-2xl">
+     <div class="text-center">
+      <div class="text-6xl mb-6">
+       🏆
+      </div>
+      <h2 class="text-5xl font-bold text-gray-900 mb-4" style="font-family: 'Georgia', serif;">Certificate of Completion</h2>
+      <div class="h-1 w-32 bg-gradient-to-r from-purple-600 to-blue-600 mx-auto mb-8"></div>
+      <p class="text-xl text-gray-700 mb-4">This is to certify that</p>
+      <p id="cert-name" class="text-4xl font-bold text-gray-900 mb-6" style="font-family: 'Georgia', serif;">John Doe</p>
+      <p class="text-xl text-gray-700 mb-4">has successfully completed</p>
+      <p id="cert-training" class="text-3xl font-bold text-purple-700 mb-8" style="font-family: 'Georgia', serif;">Security Awareness Training</p>
+      <div class="flex justify-center items-center gap-8 mb-8">
+       <div>
+        <p class="text-sm text-gray-600 mb-1">Completion Date</p>
+        <p id="cert-date" class="text-lg font-bold text-gray-900">January 15, 2025</p>
+       </div>
+       <div>
+        <p class="text-sm text-gray-600 mb-1">Score</p>
+        <p id="cert-score" class="text-lg font-bold text-green-600">100%</p>
+       </div>
+      </div>
+      <div class="flex justify-center gap-4 mt-12"><button onclick="downloadCertificate()" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"> 📥 Download Certificate </button> <button onclick="hideModal('certificate-modal')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-xl font-bold transition-all"> Close </button>
+      </div>
+     </div>
+    </div>
+   </div><!-- Add Employee Modal -->
+   <div id="add-employee-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-md animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Add New Employee</h3><button onclick="hideModal('add-employee-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="add-employee-form" onsubmit="handleAddEmployee(event)" class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label> <input type="text" id="emp-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Email</label> <input type="email" id="emp-email" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Department</label> <select id="emp-dept" onchange="handleDepartmentChange(this)" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all"> <option value="">Select Department</option> </select>
+      </div>
+      <div id="new-dept-section" class="hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">New Department Name</label> <input type="text" id="new-dept-name" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('add-employee-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="add-emp-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Add Employee</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Assign Training Modal -->
+   <div id="assign-training-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Assign Training</h3><button onclick="hideModal('assign-training-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="assign-training-form" onsubmit="handleAssignTraining(event)" class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Select Employee</label> <select id="training-employee" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Choose employee...</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Supervisor/Manager (Optional)</label> <select id="training-supervisor" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">No supervisor</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Training Title</label> <input type="text" id="training-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Framework</label> <select id="training-framework" onchange="handleFrameworkChange(this, 'training')" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select framework...</option> </select>
+      </div>
+      <div id="new-framework-section-training" class="hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">New Framework Name</label> <input type="text" id="new-framework-name-training" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Content Type</label> <select id="training-content-type" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select content type...</option> <option value="video">📹 Video Training</option> <option value="pdf">📄 PDF Document</option> <option value="presentation">📊 Presentation</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Content URL</label> <input type="url" id="training-content-url" required placeholder="https://example.com/training-material" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       <p class="text-xs text-gray-500 mt-1">For videos: YouTube/Vimeo URL. For PDFs: Direct link to PDF file</p>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Due Date</label> <input type="date" id="training-due" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('assign-training-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="assign-training-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Assign Training</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Add Control Modal -->
+   <div id="add-control-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Add Compliance Control</h3><button onclick="hideModal('add-control-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="add-control-form" onsubmit="handleAddControl(event)" class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Control ID</label> <input type="text" id="control-id" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Control Name</label> <input type="text" id="control-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Framework</label> <select id="control-framework" onchange="handleFrameworkChange(this, 'control')" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select framework...</option> </select>
+      </div>
+      <div id="new-framework-section-control" class="hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">New Framework Name</label> <input type="text" id="new-framework-name-control" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Status</label> <select id="control-status" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="Compliant">Compliant</option> <option value="Partial">Partially Compliant</option> <option value="Non-Compliant">Non-Compliant</option> </select>
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('add-control-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="add-control-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Add Control</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Add Vendor Modal -->
+   <div id="add-vendor-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Add Vendor</h3><button onclick="hideModal('add-vendor-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="add-vendor-form" onsubmit="handleAddVendor(event)" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Name</label> <input type="text" id="vendor-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Contact Email</label> <input type="email" id="vendor-email" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Service</label> <input type="text" id="vendor-service" required placeholder="e.g., Cloud Storage, Payment Processing, CRM" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Risk Score (0-100)</label> <input type="number" id="vendor-risk" required min="0" max="100" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Certificate Name</label> <input type="text" id="vendor-cert-name" required placeholder="e.g., ISO 27001, SOC 2 Type II" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Certificate Expiry Date</label> <input type="date" id="vendor-expiry" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Upload Certificate (PDF only)</label> <input type="file" id="vendor-cert-file" accept=".pdf" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+       <p class="text-xs text-gray-500 mt-1">PDF format only, max 10MB</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Point of Contact</label> <input type="text" id="vendor-poc" required placeholder="Name of vendor's representative" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Our Internal Owner</label> <select id="vendor-internal-owner" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select employee...</option> </select>
+       </div>
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('add-vendor-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="add-vendor-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Add Vendor</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Edit Employee Modal -->
+   <div id="edit-employee-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-md animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Edit Employee</h3><button onclick="hideModal('edit-employee-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="edit-employee-form" onsubmit="handleEditEmployee(event)" class="space-y-4"><input type="hidden" id="edit-emp-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label> <input type="text" id="edit-emp-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Email</label> <input type="email" id="edit-emp-email" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Department</label> <select id="edit-emp-dept" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-all"> <option value="">Select Department</option> </select>
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('edit-employee-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="edit-emp-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Save Changes</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Edit Training Modal -->
+   <div id="edit-training-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Edit Training</h3><button onclick="hideModal('edit-training-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="edit-training-form" onsubmit="handleEditTraining(event)" class="space-y-4"><input type="hidden" id="edit-training-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Training Title</label> <input type="text" id="edit-training-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Framework</label> <select id="edit-training-framework" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select framework...</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Content Type</label> <select id="edit-training-content-type" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select content type...</option> <option value="video">📹 Video Training</option> <option value="pdf">📄 PDF Document</option> <option value="presentation">📊 Presentation</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Content URL</label> <input type="url" id="edit-training-content-url" required placeholder="https://example.com/training-material" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Due Date</label> <input type="date" id="edit-training-due" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('edit-training-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="edit-training-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Save Changes</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Edit Control Modal -->
+   <div id="edit-control-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Edit Compliance Control</h3><button onclick="hideModal('edit-control-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="edit-control-form" onsubmit="handleEditControl(event)" class="space-y-4"><input type="hidden" id="edit-control-backend-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Control ID</label> <input type="text" id="edit-control-id" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Control Name</label> <input type="text" id="edit-control-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Framework</label> <select id="edit-control-framework" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select framework...</option> </select>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Status</label> <select id="edit-control-status" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="Compliant">Compliant</option> <option value="Partial">Partially Compliant</option> <option value="Non-Compliant">Non-Compliant</option> </select>
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('edit-control-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="edit-control-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Save Changes</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Edit Vendor Modal -->
+   <div id="edit-vendor-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+     <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Edit Vendor</h3><button onclick="hideModal('edit-vendor-modal')" class="text-gray-500 hover:text-gray-700 text-3xl">×</button>
+     </div>
+     <form id="edit-vendor-form" onsubmit="handleEditVendor(event)" class="space-y-4"><input type="hidden" id="edit-vendor-backend-id">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Name</label> <input type="text" id="edit-vendor-name" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Contact Email</label> <input type="email" id="edit-vendor-email" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Service</label> <input type="text" id="edit-vendor-service" required placeholder="e.g., Cloud Storage, Payment Processing, CRM" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Risk Score (0-100)</label> <input type="number" id="edit-vendor-risk" required min="0" max="100" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Certificate Name</label> <input type="text" id="edit-vendor-cert-name" required placeholder="e.g., ISO 27001, SOC 2 Type II" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Certificate Expiry Date</label> <input type="date" id="edit-vendor-expiry" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+      </div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Update Certificate (PDF only) - Optional</label>
+       <div id="edit-vendor-current-cert" class="mb-2 text-sm text-gray-600"></div><input type="file" id="edit-vendor-cert-file" accept=".pdf" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+       <p class="text-xs text-gray-500 mt-1">Leave empty to keep existing certificate</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Vendor Point of Contact</label> <input type="text" id="edit-vendor-poc" required placeholder="Name of vendor's representative" class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Our Internal Owner</label> <select id="edit-vendor-internal-owner" required class="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500"> <option value="">Select employee...</option> </select>
+       </div>
+      </div>
+      <div class="flex gap-3 mt-6"><button type="button" onclick="hideModal('edit-vendor-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-xl font-bold transition-all">Cancel</button> <button type="submit" id="edit-vendor-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-bold transition-all">Save Changes</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Delete Confirmation Modal -->
+   <div id="delete-confirmation-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <div class="card-glass rounded-2xl p-8 w-full max-w-md animate-fade-in shadow-2xl">
+     <div class="text-center">
+      <div class="text-6xl mb-4">
+       🗑️
+      </div>
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+      <p class="text-gray-700 mb-6" id="delete-message">Are you sure you want to delete this item? This action cannot be undone.</p>
+      <div class="flex gap-3"><button onclick="hideModal('delete-confirmation-modal')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-xl font-bold transition-all">Cancel</button> <button onclick="confirmDelete()" id="confirm-delete-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all">Delete</button>
+      </div>
+     </div>
+    </div>
+   </div><!-- Toast Notification -->
+   <div id="toast" class="fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl hidden z-50 animate-fade-in font-semibold"><span id="toast-message">Success!</span>
+   </div>
+  </div>
+  <script>
+    // Configuration
+    const defaultConfig = {
+      app_title: 'Compliance Command Center',
+      organization_name: 'Your Organization'
+    };
+
+    // State - Use window object for all global state
+    let currentUserRole = 'admin';
+    let currentTab = 'dashboard';
+    let currentUserId = 'demo@example.com';
+    let currentTrainingRecord = null;
+    let pendingDeleteAction = null;
+    let pendingDeleteRecord = null;
+    
+    // Initialize window.allData immediately
+    window.allData = [];
+    window.currentEditRecord = null;
+
+    // Sample assessment questions for different frameworks
+    const assessmentQuestions = {
+      'ISO 27001': [
+        {
+          question: 'What is the primary purpose of ISO 27001?',
+          options: ['Data backup', 'Information security management', 'Software development', 'Network configuration'],
+          correct: 1
+        },
+        {
+          question: 'Which of the following is a key component of an ISMS?',
+          options: ['Risk assessment', 'Marketing strategy', 'Sales forecast', 'Product design'],
+          correct: 0
+        },
+        {
+          question: 'How often should security policies be reviewed?',
+          options: ['Never', 'Every 5 years', 'Annually or when significant changes occur', 'Only during audits'],
+          correct: 2
+        }
+      ],
+      'NIST': [
+        {
+          question: 'What does NIST stand for?',
+          options: ['National Institute of Standards and Technology', 'Network Information Security Team', 'National IT Security Training', 'New Internet Security Tools'],
+          correct: 0
+        },
+        {
+          question: 'Which is a core function of the NIST Cybersecurity Framework?',
+          options: ['Sell', 'Identify', 'Market', 'Design'],
+          correct: 1
+        },
+        {
+          question: 'NIST framework is primarily used for:',
+          options: ['Managing cybersecurity risk', 'Building websites', 'Creating software', 'Social media marketing'],
+          correct: 0
+        }
+      ],
+      'SOC 2': [
+        {
+          question: 'What does SOC 2 focus on?',
+          options: ['Service organization controls', 'Software optimization', 'Sales operations', 'Social media compliance'],
+          correct: 0
+        },
+        {
+          question: 'Which trust service principle is NOT part of SOC 2?',
+          options: ['Security', 'Availability', 'Marketing', 'Confidentiality'],
+          correct: 2
+        },
+        {
+          question: 'How often should SOC 2 audits typically be performed?',
+          options: ['Never', 'Every 5 years', 'Annually', 'Monthly'],
+          correct: 2
+        }
+      ],
+      'GDPR': [
+        {
+          question: 'What does GDPR stand for?',
+          options: ['General Data Protection Regulation', 'Global Data Privacy Rules', 'Government Data Processing Requirements', 'General Digital Protection Rights'],
+          correct: 0
+        },
+        {
+          question: 'Under GDPR, what is the maximum time to report a data breach?',
+          options: ['24 hours', '48 hours', '72 hours', '1 week'],
+          correct: 2
+        },
+        {
+          question: 'Which right is granted to individuals under GDPR?',
+          options: ['Right to be forgotten', 'Right to unlimited storage', 'Right to hack systems', 'Right to sell data'],
+          correct: 0
+        }
+      ],
+      'HIPAA': [
+        {
+          question: 'What does HIPAA protect?',
+          options: ['Health information', 'Financial data', 'Social media posts', 'Email marketing'],
+          correct: 0
+        },
+        {
+          question: 'Who must comply with HIPAA?',
+          options: ['Only hospitals', 'All businesses', 'Healthcare providers and business associates', 'Software companies'],
+          correct: 2
+        },
+        {
+          question: 'What is PHI?',
+          options: ['Public Health Information', 'Protected Health Information', 'Private Hospital Inventory', 'Patient History Index'],
+          correct: 1
+        }
+      ],
+      'PCI DSS': [
+        {
+          question: 'What does PCI DSS stand for?',
+          options: ['Payment Card Industry Data Security Standard', 'Private Card Information Data Storage System', 'Public Card Index Database Security', 'Personal Credit Info Data Security'],
+          correct: 0
+        },
+        {
+          question: 'How many requirements are in PCI DSS?',
+          options: ['6', '12', '24', '50'],
+          correct: 1
+        },
+        {
+          question: 'Who must comply with PCI DSS?',
+          options: ['Only banks', 'Any organization that processes payment cards', 'Only online retailers', 'Only credit card companies'],
+          correct: 1
+        }
+      ]
+    };
+
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://vprwrmauwjuovxecaexg.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_86vwhzGar6Cvey7MUdhzBQ_ZW3uLKZN';
+    
+    let supabaseClient = null;
+    
+    // Initialize Supabase
+    async function initSupabase() {
+      try {
+        const { createClient } = window.supabase;
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('Supabase initialized');
+        return true;
+      } catch (err) {
+        console.error('Supabase initialization failed:', err);
+        return false;
+      }
+    }
+
+    // Supabase Storage Manager - supports multiple tables
+    const storageManager = window.storageManager || {
+      // Map record types to table names
+      tableMap: {
+        'employee': 'employees',
+        'training': 'trainings',
+        'control': 'controls',
+        'vendor': 'vendors',
+        'notification': 'notifications'
+      },
+
+      // Define allowed columns for each table to prevent 400 errors
+      // STRICTLY MATCHES SUPABASE SCHEMA
+      allowedColumns: {
+        'employees': ['employee_name', 'employee_email', 'department', 'status', 'created_by', 'updated_at', 'created_at'],
+        'trainings': ['training_id', 'training_name', 'framework', 'employee_id', 'employee_email', 'supervisor_email', 'content_type', 'content_url', 'due_date', 'status', 'score', 'completion_date', 'created_by', 'updated_at', 'created_at'],
+        'controls': ['control_id', 'control_name', 'framework', 'control_status', 'created_by', 'created_at'],
+        'vendors': ['vendor_name', 'vendor_email', 'vendor_service', 'risk_score', 'certificate_name', 'expiry_date', 'certificate_file_name', 'vendor_poc', 'internal_owner', 'created_by', 'created_at'],
+        'notifications': ['notification_type', 'notification_message', 'notification_recipient', 'notification_date', 'notification_read', 'created_by', 'updated_at', 'created_at']
+      },
+
+      filterDataForTable(tableName, data) {
+        if (tableName === 'compliance_records') return data; // Legacy table allows everything
+        const allowed = this.allowedColumns[tableName];
+        if (!allowed) {
+            console.warn(`No allowed columns defined for ${tableName}, allowing all.`);
+            return data;
+        }
+        
+        const filtered = {};
+        Object.keys(data).forEach(key => {
+          if (allowed.includes(key)) {
+            filtered[key] = data[key];
+          }
+        });
+        return filtered;
+      },
+
+      getTableName(recordType) {
+        return this.tableMap[recordType] || 'compliance_records';
+      },
+
+      async getAllData() {
+        try {
+          if (!supabaseClient) return [];
+          
+          let allRecords = [];
+          
+          for (const [type, table] of Object.entries(this.tableMap)) {
+            try {
+              const { data, error } = await supabaseClient
+                .from(table)
+                .select('*');
+              
+              if (error) {
+                console.warn(`Could not fetch from ${table}:`, error.message);
+                continue;
+              }
+              
+              console.log(`Fetched ${(data || []).length} records from ${table}`);
+              const tagged = (data || []).map(r => ({
+                ...r,
+                record_type: type,
+                _source_table: table
+              }));
+              allRecords = allRecords.concat(tagged);
+            } catch (err) {
+              console.warn(`Error fetching ${table}:`, err);
+            }
+          }
+          
+          try {
+            const { data, error } = await supabaseClient
+              .from('compliance_records')
+              .select('*');
+            
+            if (!error && data) {
+              console.log(`Fetched ${(data || []).length} records from compliance_records`);
+              const taggedLegacy = (data || []).map(r => ({
+                ...r,
+                _source_table: 'compliance_records'
+              }));
+              allRecords = allRecords.concat(taggedLegacy);
+            }
+          } catch (err) {
+            console.warn('Error fetching from compliance_records:', err);
+          }
+          
+          console.log('Total loaded records:', allRecords.length, allRecords);
+          return allRecords;
+        } catch (err) {
+          console.error('Failed to get data from Supabase:', err);
+          return [];
+        }
+      },
+      
+      async saveData(data) {
+        // Not used with Supabase - data is saved immediately
+        await this.triggerDataChange();
+      },
+     
+      async create(record) {
+        try {
+          if (!supabaseClient) return { isOk: false, error: 'No Supabase client' };
+          
+          // Get current user
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          
+          const recordType = record.record_type;
+          const tableName = this.getTableName(recordType);
+          
+          const { record_type, ...insertData } = record;
+          insertData.created_at = new Date().toISOString();
+          
+          // Explicitly set created_by if user is logged in
+          if (user) {
+            insertData.created_by = user.id;
+          }
+          
+          // Filter data to match table schema
+          const filteredInsertData = this.filterDataForTable(tableName, insertData);
+          
+          console.log('Creating record in', tableName, 'with owner:', insertData.created_by);
+          
+          const { data, error } = await supabaseClient
+            .from(tableName)
+            .insert([filteredInsertData])
+            .select();
+          
+          if (error) {
+            console.error('Error creating record:', error.message);
+            return { isOk: false };
+          }
+          await this.triggerDataChange();
+          return { isOk: true, data: data[0] };
+        } catch (err) {
+          console.error('❌ Failed to create record:', err);
+          return { isOk: false };
+        }
+      },
+      
+      async update(updates) {
+        try {
+          if (!supabaseClient || !updates.id) return { isOk: false, error: 'No client or ID' };
+          
+          // Get current user
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          console.log('Current Auth User:', user ? user.id : 'Not logged in');
+          console.log('Record created_by:', updates.created_by);
+          
+          if (user && updates.created_by && user.id !== updates.created_by) {
+            console.warn('⚠️ ownership mismatch! Updating created_by to current user.');
+            // Claim ownership of the record if user is updating it
+            updates.created_by = user.id;
+          }
+
+          const recordType = updates.record_type;
+          let tableName = this.getTableName(recordType);
+          
+          // Only allow _source_table to override if it is 'compliance_records' (legacy support)
+          if (updates._source_table === 'compliance_records') {
+            tableName = 'compliance_records';
+          }
+          
+          console.log('Updating record:', updates.id, 'in table:', tableName);
+          
+          const { record_type, _source_table, ...updateData } = updates;
+          updateData.updated_at = new Date().toISOString();
+          // Ensure created_by is set to current user
+          if (user) {
+            updateData.created_by = user.id;
+          }
+          
+          console.log('Sending update data:', updateData);
+          
+          // Filter data to match table schema to avoid 400 errors
+          const filteredUpdateData = this.filterDataForTable(tableName, updateData);
+          console.log('Filtered update data:', filteredUpdateData);
+          
+          // Use select() to confirm the row was actually updated
+          const { data, error } = await supabaseClient
+            .from(tableName)
+            .update(filteredUpdateData)
+            .eq('id', updates.id)
+            .select();
+          
+          if (error) {
+            console.error('Error updating record:', error);
+            return { isOk: false, error: error.message };
+          }
+          
+          // Check if any row was returned
+          if (!data || data.length === 0) {
+            console.error('❌ Update succeeded but no rows were modified. RLS policy likely blocked the update.');
+            return { isOk: false, error: 'Access denied: RLS policy blocked the update. Check console for details.' };
+          }
+          
+          console.log('✅ Update successful');
+          await this.triggerDataChange();
+          return { isOk: true };
+        } catch (err) {
+          console.error('Failed to update record:', err);
+          return { isOk: false, error: err.message };
+        }
+      },
+      
+      async delete(id, recordType = null) {
+        try {
+          if (!supabaseClient) return { isOk: false, error: 'No client' };
+          
+          // Get current user
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          
+          let tableName = 'compliance_records';
+          // Accept either a string recordType or a full record object
+          let record = recordType && typeof recordType === 'object' ? recordType : (window.allData || []).find(r => String(r.id) === String(id));
+          
+          if (record) {
+             console.log('Current Auth User:', user ? user.id : 'Not logged in');
+             console.log('Record created_by:', record.created_by);
+             
+             if (user && record.created_by && user.id !== record.created_by) {
+                console.warn('⚠️ ownership mismatch! First updating ownership then deleting.');
+                // First, claim ownership by updating the record's created_by
+                const updateResult = await supabaseClient
+                  .from(tableName || 'compliance_records')
+                  .update({ created_by: user.id })
+                  .eq('id', id)
+                  .select();
+                  
+                if (updateResult.error) {
+                  console.error('Failed to claim ownership:', updateResult.error);
+                  // Try to delete anyway - might work with different RLS
+                }
+             }
+          }
+          
+          if (record && record._source_table === 'compliance_records') {
+            tableName = 'compliance_records';
+          } else if (record && record.record_type) {
+            tableName = this.getTableName(record.record_type);
+          } else if (recordType && typeof recordType === 'string') {
+            tableName = this.getTableName(recordType);
+          } else if (record && record._source_table) {
+             // Fallback for cases where record_type might be missing but source_table exists
+             tableName = record._source_table;
+          }
+          
+          console.log('Deleting record:', id, 'from table:', tableName);
+          
+          // Use select() to confirm the row was actually deleted
+          const { data, error } = await supabaseClient
+            .from(tableName)
+            .delete()
+            .eq('id', id)
+            .select();
+          
+          if (error) {
+            console.error('Error deleting record:', error);
+            return { isOk: false, error: error.message };
+          }
+          
+          // Check if any row was returned
+          if (!data || data.length === 0) {
+            console.error('❌ Delete succeeded but no rows were modified. RLS policy likely blocked the delete.');
+            return { isOk: false, error: 'Access denied: RLS policy blocked the delete. Check console for details.' };
+          }
+          
+          console.log('✅ Delete successful');
+          await this.triggerDataChange();
+          return { isOk: true };
+        } catch (err) {
+          console.error('Failed to delete record:', err);
+          return { isOk: false, error: err.message };
+        }
+      },
+      
+      async triggerDataChange() {
+        try {
+          const updatedData = await this.getAllData();
+          console.log('Data updated. Total records:', updatedData.length);
+          // Update global allData
+          window.allData = updatedData;
+          // Call onDataChanged if available
+          if (typeof window.onDataChanged === 'function') {
+            window.onDataChanged(updatedData);
+          }
+        } catch (err) {
+          console.error('Failed to trigger data change:', err);
+        }
+      }
+    };
+    
+    window.storageManager = storageManager;
+
+      // Global function to handle data changes
+    function onDataChanged(data) {
+      window.allData = data;
+      console.log('onDataChanged called with', data.length, 'records');
+      const empRecords = data.filter(r => r.record_type === 'employee');
+      console.log('Employee records:', empRecords);
+      empRecords.forEach(e => console.log('Employee ID:', e.id, 'Name:', e.employee_name, 'created_by:', e.created_by));
+      try {
+        updateDashboard();
+        renderEmployees();
+        renderTrainings();
+        renderMyTrainings();
+        renderSupervisedTraining();
+        renderControls();
+        renderVendors();
+        updateEmployeeDropdowns();
+        updateNotifications();
+      } catch (err) {
+        console.error('Error in onDataChanged:', err);
+      }
+    }
+
+    // Make it globally accessible
+    window.onDataChanged = onDataChanged;
+
+    const dataHandler = {
+      onDataChanged: onDataChanged
+    };
+
+    window.dataHandler = dataHandler;
+
+    // Config Manager using Supabase
+    const configManager = {
+      currentConfig: { ...defaultConfig },
+      
+      async getConfig() {
+        try {
+          if (!supabaseClient) return { ...defaultConfig };
+          
+          const { data, error } = await supabaseClient
+            .from('app_config')
+            .select('*')
+            .single();
+          
+          // Handle RLS/permission errors gracefully
+          if (error) {
+            console.warn('Warning fetching config:', error.code, error.message);
+            // Return default config on any error (RLS blocks, no data, etc)
+            return { ...defaultConfig };
+          }
+          
+          if (data) {
+            this.currentConfig = { ...defaultConfig, ...data };
+            console.log('✅ Config loaded from Supabase');
+          }
+          return this.currentConfig;
+        } catch (err) {
+          console.warn('Failed to get config (expected with RLS):', err.message);
+          return { ...defaultConfig };
+        }
+      },
+      
+      async setConfig(config) {
+        try {
+          if (!supabaseClient) return this.currentConfig;
+          
+          const updated = { ...this.currentConfig, ...config };
+          
+          const { error } = await supabaseClient
+            .from('app_config')
+            .upsert(updated);
+          
+          if (error) {
+            console.error('Error saving config:', error);
+            return this.currentConfig;
+          }
+          
+          this.currentConfig = updated;
+          this.notifyConfigChange(updated);
+          console.log('Config saved to Supabase');
+          return updated;
+        } catch (err) {
+          console.error('Failed to set config:', err);
+          return this.currentConfig;
+        }
+      },
+      
+      notifyConfigChange(config) {
+        document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+        document.getElementById('org-name').textContent = config.organization_name || defaultConfig.organization_name;
+        document.getElementById('org-name-input').value = config.organization_name || defaultConfig.organization_name;
+      }
+    };
+
+    async function updateOrganizationName(name) {
+      configManager.setConfig({ organization_name: name });
+      showToast('✅ Organization name updated!');
+    }
+
+    // Initialize all dropdowns with default values
+    function initializeDropdowns() {
+      try {
+        updateDepartmentDropdowns();
+        updateFrameworkDropdowns();
+        updateEmployeeDropdowns();
+        console.log('Dropdowns initialized');
+      } catch (err) {
+        console.error('Error initializing dropdowns:', err);
+      }
+    }
+
+    // Auth functions
+    function toggleAuthForm() {
+      document.getElementById('auth-form-container').classList.toggle('hidden');
+      document.getElementById('signup-form-container').classList.toggle('hidden');
+      document.getElementById('auth-error').classList.add('hidden');
+    }
+
+    function showAuthError(message) {
+      const errorEl = document.getElementById('auth-error');
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+    }
+
+    async function handleSignUp(event) {
+      event.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-password-confirm').value;
+
+      if (password !== confirm) {
+        showAuthError('Passwords do not match');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthError('Password must be at least 6 characters');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password
+        });
+
+        if (error) {
+          showAuthError(error.message);
+          return;
+        }
+
+        showToast('✅ Account created! Please sign in.', 'success');
+        toggleAuthForm();
+      } catch (err) {
+        showAuthError(err.message);
+      }
+    }
+
+    async function handleSignIn(event) {
+      event.preventDefault();
+      const email = document.getElementById('signin-email').value;
+      const password = document.getElementById('signin-password').value;
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          showAuthError(error.message);
+          return;
+        }
+
+        currentUserId = email;
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        await initApp();
+      } catch (err) {
+        showAuthError(err.message);
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) {
+          showToast('Error logging out: ' + error.message, 'error');
+          return;
+        }
+        
+        showToast('✅ Logged out successfully!', 'success');
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('auth-modal').classList.remove('hidden');
+        
+        // Reset form
+        document.getElementById('signin-form').reset();
+        document.getElementById('signup-form').reset();
+        document.getElementById('auth-error').classList.add('hidden');
+        document.getElementById('auth-form-container').classList.remove('hidden');
+        document.getElementById('signup-form-container').classList.add('hidden');
+        
+        // Clear data
+        window.allData = [];
+        currentUserId = 'demo@example.com';
+      } catch (err) {
+        showToast('Error logging out: ' + err.message, 'error');
+      }
+    }
+
+    async function checkAuth() {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          currentUserId = session.user.email;
+          document.getElementById('auth-modal').classList.add('hidden');
+          document.getElementById('app').classList.remove('hidden');
+          await initApp();
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+      }
+    }
+
+    async function initApp() {
+      try {
+        // Initialize Supabase first
+        const supabaseReady = await initSupabase();
+        if (!supabaseReady) {
+          showToast('Database connection failed', 'error');
+          return;
+        }
+        
+        // Restore UI state from localStorage
+        const savedState = loadUIState();
+        currentUserRole = savedState.currentUserRole || 'admin';
+        currentTab = savedState.currentTab || 'dashboard';
+        
+        // Check current user
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        console.log('Current user:', user?.id, user?.email);
+        
+        // Load config
+        const config = await configManager.getConfig();
+        configManager.notifyConfigChange(config);
+        
+        // Initialize dropdowns first (with empty data)
+        initializeDropdowns();
+        
+        // Load data from Supabase
+        window.allData = await storageManager.getAllData();
+        console.log('App initialized. Loaded records:', window.allData.length);
+        dataHandler.onDataChanged(window.allData);
+        
+        // Restore UI role and tab
+        document.getElementById('user-role-selector').value = currentUserRole;
+        switchUserRole(currentUserRole);
+        switchTab(currentTab);
+        
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+        });
+        
+        showToast('✅ Connected to database', 'success');
+      } catch (err) {
+        console.error('App initialization error:', err);
+        showToast('Failed to initialize app', 'error');
+      }
+    }
+
+    // Initialize Supabase and check auth when page loads
+    async function initializePage() {
+      try {
+        const supabaseReady = await initSupabase();
+        if (!supabaseReady) {
+          showToast('Database connection failed', 'error');
+          return;
+        }
+        await checkAuth();
+      } catch (err) {
+        console.error('Page initialization error:', err);
+      }
+    }
+
+    // Initialize when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      initializePage();
+    }
+
+    // Utility functions
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Validation functions
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function isValidDate(dateString) {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
+
+    function checkEmailDuplicate(email, excludeId = null) {
+      return window.allData.some(r => r.employee_email === email && r.id !== excludeId && r.record_type === 'employee');
+    }
+    
+    // Debounced organization name update
+    const debouncedUpdateOrgName = debounce(function(name) {
+      configManager.setConfig({ organization_name: name });
+      showToast('✅ Organization name updated!');
+    }, 1000);
+
+    // Helper functions
+    function getRecordsByType(type) {
+      return (window.allData || []).filter(r => r.record_type === type);
+    }
+
+    function getEmployees() {
+      return getRecordsByType('employee');
+    }
+
+    function getTrainings() {
+      return getRecordsByType('training');
+    }
+
+    function getControls() {
+      return getRecordsByType('control');
+    }
+
+    function getVendors() {
+      return getRecordsByType('vendor');
+    }
+
+    function getNotifications() {
+      return getRecordsByType('notification');
+    }
+
+    // LocalStorage persistence for UI state
+    function saveUIState() {
+      const state = {
+        currentUserRole,
+        currentTab: currentTab || 'dashboard'
+      };
+      localStorage.setItem('complianceDashboardState', JSON.stringify(state));
+    }
+
+    function loadUIState() {
+      try {
+        const saved = localStorage.getItem('complianceDashboardState');
+        if (saved) {
+          const state = JSON.parse(saved);
+          return state;
+        }
+      } catch (err) {
+        console.warn('Failed to load UI state:', err);
+      }
+      return { currentUserRole: 'admin', currentTab: 'dashboard' };
+    }
+
+    // Role switching
+    function switchUserRole(role) {
+      currentUserRole = role;
+      saveUIState();
+     
+      // Toggle visibility of admin/employee specific content
+      const adminTabs = document.querySelectorAll('.admin-tab');
+      const employeeTabs = document.querySelectorAll('.employee-tab');
+      const supervisorTabs = document.querySelectorAll('.supervisor-tab');
+      const adminContent = document.querySelectorAll('.admin-content');
+      const employeeContent = document.querySelectorAll('.employee-content');
+      const employeeSelector = document.getElementById('employee-selector-container');
+     
+      if (role === 'employee') {
+        adminTabs.forEach(tab => tab.classList.add('hidden'));
+        employeeTabs.forEach(tab => tab.classList.remove('hidden'));
+        adminContent.forEach(content => content.classList.add('hidden'));
+        employeeContent.forEach(content => content.classList.remove('hidden'));
+       
+        // Show employee selector
+        employeeSelector.classList.remove('hidden');
+        updateEmployeeViewSelector();
+       
+        // Set current user to first employee if exists
+        const employees = getEmployees();
+        if (employees.length > 0) {
+          currentUserId = employees[0].employee_email;
+          document.getElementById('employee-view-selector').value = currentUserId;
+        }
+       
+        // Check if user is a supervisor
+        const isSupervisor = checkIfSupervisor(currentUserId);
+        supervisorTabs.forEach(tab => {
+          if (isSupervisor) {
+            tab.classList.remove('hidden');
+          } else {
+            tab.classList.add('hidden');
+          }
+        });
+       
+        // Render training immediately after setting the user
+        renderMyTrainings();
+        if (isSupervisor) {
+          renderSupervisedTraining();
+        }
+        switchTab('my-training');
+      } else {
+        adminTabs.forEach(tab => tab.classList.remove('hidden'));
+        employeeTabs.forEach(tab => tab.classList.add('hidden'));
+        supervisorTabs.forEach(tab => tab.classList.add('hidden'));
+        adminContent.forEach(content => content.classList.remove('hidden'));
+        employeeContent.forEach(content => content.classList.add('hidden'));
+       
+        // Hide employee selector
+        employeeSelector.classList.add('hidden');
+       
+        switchTab('dashboard');
+      }
+    }
+
+    function updateEmployeeViewSelector() {
+      const employees = getEmployees();
+      const selector = document.getElementById('employee-view-selector');
+     
+      if (selector) {
+        const currentValue = selector.value;
+        selector.innerHTML = '<option value="">Select employee...</option>';
+        employees.forEach(emp => {
+          selector.innerHTML += `<option value="${emp.employee_email}">${emp.employee_name} - ${emp.department}</option>`;
+        });
+        if (currentValue) selector.value = currentValue;
+      }
+    }
+
+    function changeEmployeeView(email) {
+      if (email) {
+        currentUserId = email;
+       
+        // Update supervisor tab visibility
+        const isSupervisor = checkIfSupervisor(currentUserId);
+        const supervisorTabs = document.querySelectorAll('.supervisor-tab');
+        supervisorTabs.forEach(tab => {
+          if (isSupervisor) {
+            tab.classList.remove('hidden');
+          } else {
+            tab.classList.add('hidden');
+          }
+        });
+       
+        renderMyTrainings();
+        if (isSupervisor) {
+          renderSupervisedTraining();
+        }
+        showToast(`👤 Viewing as ${getEmployees().find(e => e.employee_email === email)?.employee_name}`);
+      }
+    }
+
+    // Check if user is a supervisor
+    function checkIfSupervisor(email) {
+      const trainings = getTrainings();
+      return trainings.some(t => t.supervisor_email === email);
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      currentTab = tabName;
+      saveUIState();
+      
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('tab-active');
+      });
+     
+      const section = document.getElementById(`section-${tabName}`);
+      const tab = document.getElementById(`tab-${tabName}`);
+     
+      if (section) section.classList.remove('hidden');
+      if (tab) tab.classList.add('tab-active');
+    }
+
+    // Modal functions
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+      document.getElementById(modalId).classList.add('flex');
+    }
+
+    function hideModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+      document.getElementById(modalId).classList.remove('flex');
+    }
+
+    // Toast notification
+     function showToast(message, type = 'success') {
+       const toast = document.getElementById('toast');
+       const toastMessage = document.getElementById('toast-message');
+       toastMessage.textContent = message;
+       console.log(`Toast [${type}]:`, message); // Log to console for visibility
+       toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in font-semibold ${
+         type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+       }`;
+       toast.classList.remove('hidden');
+       setTimeout(() => toast.classList.add('hidden'), 4000);
+     }
+
+    // Notification functions
+    function toggleNotifications() {
+      document.getElementById('notification-panel').classList.toggle('hidden');
+    }
+
+    function updateNotifications() {
+      const notifications = getNotifications();
+      const unread = notifications.filter(n => n.notification_read !== 'true');
+     
+      const badge = document.getElementById('notification-badge');
+      if (unread.length > 0) {
+        badge.classList.remove('hidden');
+        badge.textContent = unread.length;
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      const container = document.getElementById('notification-list');
+      if (notifications.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No notifications</p>';
+        return;
+      }
+
+      const sorted = [...notifications].sort((a, b) => new Date(b.notification_date) - new Date(a.notification_date)).slice(0, 20);
+      container.innerHTML = sorted.map(notif => {
+        const isUnread = notif.notification_read !== 'true';
+        return `
+          <div onclick="markNotificationRead('${notif.id}')" class="bg-slate-800/70 rounded-xl p-4 cursor-pointer hover:bg-slate-700/70 transition-all ${isUnread ? 'border-l-4 border-purple-500' : ''}">
+            <p class="text-sm ${isUnread ? 'font-bold text-white' : 'text-gray-300'}">${notif.notification_message}</p>
+            <p class="text-xs text-gray-500 mt-1">${new Date(notif.notification_date).toLocaleString()}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function markNotificationRead(notifId) {
+      const notif = (window.allData || []).find(r => r.id === notifId);
+      if (notif && notif.notification_read !== 'true') {
+        await storageManager.update({ ...notif, notification_read: 'true' });
+      }
+    }
+
+    async function sendNotification(type, message, recipient) {
+      if ((window.allData || []).length >= 999) return;
+      await storageManager.create({
+        record_type: 'notification',
+        notification_type: type,
+        notification_message: message,
+        notification_recipient: recipient,
+        notification_date: new Date().toISOString(),
+        notification_read: 'false'
+      });
+    }
+
+    // Dashboard updates
+    function updateDashboard() {
+      const employees = getEmployees();
+      const trainings = getTrainings();
+      const controls = getControls();
+      const vendors = getVendors();
+     
+      document.getElementById('stat-employees').textContent = employees.length;
+      const departments = [...new Set(employees.map(e => e.department))];
+      document.getElementById('stat-departments').textContent = departments.length;
+     
+      const completed = trainings.filter(t => t.status === 'Completed').length;
+      const trainingPct = trainings.length > 0 ? Math.round((completed / trainings.length) * 100) : 0;
+      document.getElementById('stat-training').textContent = trainingPct + '%';
+     
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const overdue = trainings.filter(t => t.status !== 'Completed' && t.due_date && new Date(t.due_date) < today).length;
+      document.getElementById('stat-overdue').textContent = overdue;
+     
+      const compliant = controls.filter(c => c.control_status === 'Compliant').length;
+      const compliancePct = controls.length > 0 ? Math.round((compliant / controls.length) * 100) : 0;
+      document.getElementById('stat-compliance').textContent = compliancePct + '%';
+     
+      const frameworks = [...new Set(controls.map(c => c.framework))];
+      document.getElementById('stat-frameworks').textContent = frameworks.length;
+     
+      const highRisk = vendors.filter(v => v.risk_score >= 70).length;
+      document.getElementById('stat-vendor-risk').textContent = highRisk;
+      
+      const expiring = vendors.filter(v => {
+        try {
+          const exp = new Date(v.expiry_date);
+          if (isNaN(exp.getTime())) return false;
+          const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+          return days > 0 && days <= 30;
+        } catch {
+          return false;
+        }
+      }).length;
+      document.getElementById('stat-expiring').textContent = expiring;
+     
+      updateFrameworkStatus();
+    }
+
+    function updateFrameworkStatus() {
+      const controls = getControls();
+      const frameworks = ['ISO 27001', 'NIST', 'SOC 2', 'GDPR', 'HIPAA', 'PCI DSS'];
+      const ids = ['iso', 'nist', 'soc2', 'gdpr', 'hipaa', 'pci'];
+     
+      frameworks.forEach((fw, i) => {
+        const fwControls = controls.filter(c => c.framework === fw);
+        const compliant = fwControls.filter(c => c.control_status === 'Compliant').length;
+        const pct = fwControls.length > 0 ? Math.round((compliant / fwControls.length) * 100) : 0;
+       
+        document.getElementById(`${ids[i]}-count`).textContent = fwControls.length;
+        document.getElementById(`${ids[i]}-progress`).style.width = pct + '%';
+       
+        const statusEl = document.getElementById(`${ids[i]}-status`);
+        if (pct >= 90) statusEl.textContent = '🟢';
+        else if (pct >= 70) statusEl.textContent = '🟡';
+        else statusEl.textContent = '🔴';
+      });
+    }
+
+    // Employee functions
+    async function handleAddEmployee(e) {
+      e.preventDefault();
+      
+      if (window.allData.length >= 999) {
+        showToast('Maximum limit of 999 records reached', 'error');
+        return;
+      }
+     
+      const btn = document.getElementById('add-emp-btn');
+      const name = document.getElementById('emp-name').value.trim();
+      const email = document.getElementById('emp-email').value.trim();
+      let dept = document.getElementById('emp-dept').value;
+      
+      // Validate inputs
+      if (!name || !email || !dept) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Validate email format
+      if (!isValidEmail(email)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+      }
+      
+      // Check for duplicate email
+      if (checkEmailDuplicate(email)) {
+        showToast('This email is already in use', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+      
+      // Handle new department
+      if (dept === '__ADD_NEW__') {
+        const newDeptName = document.getElementById('new-dept-name').value.trim();
+        if (!newDeptName) {
+          showToast('Please enter a department name', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Add Employee';
+          return;
+        }
+       
+        const added = await addNewDepartment(newDeptName);
+        if (!added) {
+          btn.disabled = false;
+          btn.textContent = 'Add Employee';
+          return;
+        }
+        dept = newDeptName;
+      }
+     
+      const result = await storageManager.create({
+        record_type: 'employee',
+        employee_name: name,
+        employee_email: email,
+        department: dept
+      });
+      
+      btn.disabled = false;
+      btn.textContent = 'Add Employee';
+      
+      if (result.isOk) {
+        showToast('✅ Employee added successfully!');
+        document.getElementById('add-employee-form').reset();
+        document.getElementById('new-dept-section').classList.add('hidden');
+        hideModal('add-employee-modal');
+       
+        // Send notification asynchronously
+        sendNotification('welcome', `Welcome ${name}! You've been added to the compliance system.`, email);
+      } else {
+        showToast('Failed to add employee', 'error');
+      }
+    }
+
+    function renderEmployees() {
+      const container = document.getElementById('employee-list');
+      if (!container) return;
+      const employees = getEmployees();
+     
+      if (employees.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12 text-lg">No employees yet.</p>';
+        return;
+      }
+
+      // Cache trainings once instead of fetching for each employee
+      const allTrainings = getTrainings();
+      container.innerHTML = employees.map(emp => {
+        const trainings = allTrainings.filter(t => t.employee_email === emp.employee_email);
+        const completed = trainings.filter(t => t.status === 'Completed').length;
+        const empName = emp.employee_name || 'Unknown';
+       
+        return `
+          <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 shadow hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  ${empName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h4 class="font-bold text-gray-900 text-lg">${emp.employee_name}</h4>
+                  <p class="text-sm text-gray-600">${emp.employee_email}</p>
+                  <span class="inline-block mt-1 text-xs bg-purple-200 text-purple-800 px-3 py-1 rounded-full font-medium">${emp.department}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-center mr-4">
+                  <p class="text-3xl font-bold text-green-600">${completed}</p>
+                  <p class="text-xs text-gray-600">Completed</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <button onclick="editEmployee('${emp.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                    ✏️ Edit
+                  </button>
+                  <button onclick="confirmDeleteEmployee('${emp.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Training functions
+    async function handleAssignTraining(e) {
+      e.preventDefault();
+      if (window.allData.length >= 999) {
+        showToast('Maximum limit reached', 'error');
+        return;
+      }
+     
+      const btn = document.getElementById('assign-training-btn');
+      btn.disabled = true;
+      btn.textContent = 'Assigning...';
+     
+      const employeeEmail = document.getElementById('training-employee').value;
+      const employee = getEmployees().find(e => e.employee_email === employeeEmail);
+      const trainingName = document.getElementById('training-name').value.trim();
+      let framework = document.getElementById('training-framework').value;
+      const contentType = document.getElementById('training-content-type').value;
+      const contentUrl = document.getElementById('training-content-url').value.trim();
+      const dueDate = document.getElementById('training-due').value;
+      const supervisorEmail = document.getElementById('training-supervisor').value || '';
+      
+      // Validate inputs
+      if (!employeeEmail || !employee) {
+        showToast('Please select a valid employee', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Assign Training';
+        return;
+      }
+      
+      if (!trainingName || !framework || !contentType || !contentUrl || !dueDate) {
+        showToast('Please fill in all required fields', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Assign Training';
+        return;
+      }
+      
+      if (!isValidDate(dueDate)) {
+        showToast('Please enter a valid due date', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Assign Training';
+        return;
+      }
+     
+      // Handle new framework
+      if (framework === '__ADD_NEW__') {
+        const newFwName = document.getElementById('new-framework-name-training').value.trim();
+        if (!newFwName) {
+          showToast('Please enter a framework name', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Assign Training';
+          return;
+        }
+       
+        const added = await addNewFramework(newFwName);
+        if (!added) {
+          btn.disabled = false;
+          btn.textContent = 'Assign Training';
+          return;
+        }
+        framework = newFwName;
+      }
+     
+      const result = await storageManager.create({
+         record_type: 'training',
+         training_id: 'TR-' + Date.now(),
+         training_name: trainingName,
+         framework: framework,
+         employee_name: employee.employee_name,
+         employee_email: employee.employee_email,
+         supervisor_email: supervisorEmail || '',
+         content_type: contentType,
+         content_url: contentUrl,
+         due_date: dueDate,
+         status: 'Pending',
+         score: 0
+       });
+     
+      btn.disabled = false;
+      btn.textContent = 'Assign Training';
+     
+      if (result.isOk) {
+        showToast('✅ Training assigned successfully!');
+        hideModal('assign-training-modal');
+        document.getElementById('assign-training-form').reset();
+       
+        await sendNotification('training', `New training assigned: "${trainingName}" - Due: ${new Date(dueDate).toLocaleDateString()}`, employee.employee_email);
+       
+        // Notify supervisor if assigned
+        if (supervisorEmail) {
+          const supervisor = getEmployees().find(e => e.employee_email === supervisorEmail);
+          if (supervisor) {
+            await sendNotification('supervisor', `You are supervising ${employee.employee_name}'s training: "${trainingName}"`, supervisorEmail);
+          }
+        }
+      } else {
+        showToast('Failed to assign training', 'error');
+      }
+    }
+
+    function renderTrainings() {
+      const container = document.getElementById('training-list');
+      const trainings = getTrainings();
+     
+      if (trainings.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12 text-lg">No training assignments yet.</p>';
+        return;
+      }
+
+      container.innerHTML = trainings.map(tr => {
+        const statusColors = {
+          'Completed': 'bg-green-500',
+          'In Progress': 'bg-blue-500',
+          'Pending': 'bg-gray-400'
+        };
+        const isOverdue = new Date(tr.due_date) < new Date() && tr.status !== 'Completed';
+        
+        // Get employee name from training record or look it up
+        let employeeName = tr.employee_name;
+        if (!employeeName && tr.employee_email) {
+          const emp = getEmployees().find(e => e.employee_email === tr.employee_email);
+          employeeName = emp ? emp.employee_name : tr.employee_email;
+        }
+       
+        return `
+          <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 shadow hover:shadow-lg transition-all">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <h4 class="font-bold text-gray-900 text-lg">${tr.training_name}</h4>
+                  <span class="text-xs px-3 py-1 rounded-full ${statusColors[tr.status]} text-white font-medium">${tr.status}</span>
+                  ${isOverdue ? '<span class="text-xs px-3 py-1 rounded-full bg-red-500 text-white font-medium">⚠️ Overdue</span>' : ''}
+                </div>
+                <p class="text-sm text-gray-600 mb-1">👤 ${employeeName || 'Unknown'}</p>
+                <p class="text-sm text-gray-600">📅 Due: ${new Date(tr.due_date).toLocaleDateString()}</p>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">${tr.framework}</span>
+                  <span class="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">${tr.content_type}</span>
+                  ${tr.score > 0 ? `<span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Score: ${tr.score}%</span>` : ''}
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editTraining('${tr.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  ✏️ Edit
+                </button>
+                <button onclick="confirmDeleteTraining('${tr.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMyTrainings() {
+      const container = document.getElementById('my-training-list');
+      const trainings = getTrainings().filter(t => t.employee_email === currentUserId);
+     
+      if (trainings.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12 text-lg">No training assignments yet.</p>';
+        return;
+      }
+
+      container.innerHTML = trainings.map(tr => {
+        const statusColors = {
+          'Completed': 'bg-green-500',
+          'In Progress': 'bg-blue-500',
+          'Pending': 'bg-gray-400'
+        };
+        const contentIcons = {
+          'video': '📹',
+          'pdf': '📄',
+          'presentation': '📊'
+        };
+        const isOverdue = new Date(tr.due_date) < new Date() && tr.status !== 'Completed';
+       
+        return `
+          <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <h4 class="font-bold text-gray-900 text-xl">${contentIcons[tr.content_type]} ${tr.training_name}</h4>
+                  <span class="text-xs px-3 py-1 rounded-full ${statusColors[tr.status]} text-white font-medium">${tr.status}</span>
+                  ${isOverdue ? '<span class="text-xs px-3 py-1 rounded-full bg-red-500 text-white font-medium">⚠️ Overdue</span>' : ''}
+                </div>
+                <p class="text-gray-700 mb-2">${tr.framework} Compliance Training</p>
+                <p class="text-sm text-gray-600">📅 Due: ${new Date(tr.due_date).toLocaleDateString()}</p>
+                ${tr.score > 0 ? `<p class="text-sm text-green-600 font-bold mt-2">✅ Completed with ${tr.score}% score</p>` : ''}
+              </div>
+              <div>
+                ${tr.status !== 'Completed' ? `
+                  <button onclick="openTrainingContent('${tr.id}')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                    ${tr.status === 'Pending' ? 'Start Training' : 'Continue'} →
+                  </button>
+                ` : `
+                  <button onclick="viewCertificate('${tr.id}')" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                    🏆 View Certificate
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSupervisedTraining() {
+      const container = document.getElementById('supervised-training-list');
+      const supervisedTrainings = getTrainings().filter(t => t.supervisor_email === currentUserId);
+     
+      if (supervisedTrainings.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12 text-lg">No supervised training assignments.</p>';
+        return;
+      }
+
+      container.innerHTML = supervisedTrainings.map(tr => {
+        const statusColors = {
+          'Completed': 'bg-green-500',
+          'In Progress': 'bg-blue-500',
+          'Pending': 'bg-gray-400'
+        };
+        const contentIcons = {
+          'video': '📹',
+          'pdf': '📄',
+          'presentation': '📊'
+        };
+        const isOverdue = new Date(tr.due_date) < new Date() && tr.status !== 'Completed';
+        const daysUntilDue = Math.ceil((new Date(tr.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+        
+        // Get employee name from training record or look it up
+        let employeeName = tr.employee_name;
+        if (!employeeName && tr.employee_email) {
+          const emp = getEmployees().find(e => e.employee_email === tr.employee_email);
+          employeeName = emp ? emp.employee_name : tr.employee_email;
+        }
+       
+        return `
+          <div class="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all border-2 ${isOverdue ? 'border-red-400' : 'border-orange-200'}">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="font-bold text-gray-900 text-xl">${contentIcons[tr.content_type]} ${tr.training_name}</h4>
+                    <span class="text-xs px-3 py-1 rounded-full ${statusColors[tr.status]} text-white font-medium">${tr.status}</span>
+                  </div>
+                  <p class="text-gray-700 mb-2">👤 <span class="font-semibold">${employeeName || 'Unknown'}</span></p>
+                  <p class="text-sm text-gray-600 mb-1">${tr.framework} Compliance Training</p>
+                </div>
+              </div>
+             
+              <div class="flex items-center justify-between bg-white/60 rounded-lg p-4">
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">📅 Due Date</p>
+                  <p class="font-bold text-gray-900">${new Date(tr.due_date).toLocaleDateString()}</p>
+                  ${isOverdue ?
+                    '<p class="text-xs text-red-600 font-bold mt-1">⚠️ OVERDUE</p>' :
+                    daysUntilDue <= 7 && daysUntilDue > 0 ?
+                    `<p class="text-xs text-orange-600 font-bold mt-1">⏰ Due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}</p>` :
+                    ''
+                  }
+                </div>
+                ${tr.status === 'Completed' ? `
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 mb-1">✅ Score</p>
+                    <p class="text-2xl font-bold text-green-600">${tr.score}%</p>
+                    <p class="text-xs text-gray-500">Completed ${new Date(tr.completion_date).toLocaleDateString()}</p>
+                  </div>
+                ` : `
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 mb-1">Status</p>
+                    <p class="text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-orange-600'}">${isOverdue ? 'Needs Attention' : tr.status}</p>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Training content viewer
+     async function openTrainingContent(trainingId) {
+       // Try to find in window.allData first
+       currentTrainingRecord = (window.allData || []).find(r => r.id === trainingId || String(r.id) === String(trainingId));
+       
+       // If not found, load from database
+       if (!currentTrainingRecord) {
+         try {
+           const { data, error } = await supabaseClient
+             .from('trainings')
+             .select('*')
+             .eq('id', trainingId)
+             .single();
+           
+           if (error || !data) {
+             console.error('Failed to load training:', error);
+             showToast('Failed to load training', 'error');
+             return;
+           }
+           currentTrainingRecord = data;
+           currentTrainingRecord._source_table = 'trainings';
+           currentTrainingRecord.record_type = 'training';
+         } catch (err) {
+           console.error('Error loading training:', err);
+           showToast('Error loading training', 'error');
+           return;
+         }
+       }
+      
+       // Ensure metadata is set
+       if (!currentTrainingRecord._source_table) {
+         currentTrainingRecord._source_table = 'trainings';
+       }
+       if (!currentTrainingRecord.record_type) {
+         currentTrainingRecord.record_type = 'training';
+       }
+      
+       if (!currentTrainingRecord) return;
+      
+       document.getElementById('training-modal-title').textContent = currentTrainingRecord.training_name;
+      const contentArea = document.getElementById('training-content-area');
+     
+      // Load content based on type
+       if (currentTrainingRecord.content_type === 'video') {
+         // Extract video ID and embed with better error handling
+         let embedUrl = currentTrainingRecord.content_url;
+         let videoId = null;
+         
+         try {
+           // Try YouTube formats
+           if (embedUrl.includes('youtube.com/watch')) {
+             const url = new URL(embedUrl);
+             videoId = url.searchParams.get('v');
+           } else if (embedUrl.includes('youtu.be/')) {
+             videoId = embedUrl.split('youtu.be/')[1].split('?')[0].split('&')[0];
+           } else if (embedUrl.includes('vimeo.com/')) {
+             videoId = embedUrl.split('vimeo.com/')[1].split('?')[0].split('&')[0];
+             embedUrl = `https://player.vimeo.com/video/${videoId}`;
+           } else if (embedUrl.includes('youtube.com/embed/')) {
+             // Already an embed URL
+             embedUrl = embedUrl;
+           }
+           
+           // Convert YouTube video ID to embed URL
+           if (videoId && embedUrl.includes('youtu')) {
+             embedUrl = `https://www.youtube.com/embed/${videoId}`;
+           }
+         } catch (err) {
+           console.error('Error parsing video URL:', err);
+         }
+        
+         contentArea.innerHTML = `
+           <div class="mb-4">
+             <h4 class="text-xl font-bold text-gray-900 mb-4">📹 Video Training</h4>
+             <div class="video-container rounded-xl overflow-hidden shadow-lg">
+               <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+             </div>
+             <p class="text-gray-700 mt-4">Watch the complete video before proceeding to the assessment.</p>
+           </div>
+         `;
+      } else if (currentTrainingRecord.content_type === 'pdf') {
+        contentArea.innerHTML = `
+          <div class="mb-4">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">📄 PDF Training Material</h4>
+            <div class="bg-gray-100 border-2 border-gray-300 rounded-xl p-8 text-center">
+              <div class="text-6xl mb-4">📄</div>
+              <p class="text-gray-700 mb-4">Review the training document:</p>
+              <a href="${currentTrainingRecord.content_url}" target="_blank" rel="noopener noreferrer" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                📥 Open PDF Document
+              </a>
+              <p class="text-sm text-gray-600 mt-4">Read the complete document before taking the assessment.</p>
+            </div>
+          </div>
+        `;
+      } else if (currentTrainingRecord.content_type === 'presentation') {
+        contentArea.innerHTML = `
+          <div class="mb-4">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">📊 Presentation Training</h4>
+            <div class="bg-gray-100 border-2 border-gray-300 rounded-xl p-8 text-center">
+              <div class="text-6xl mb-4">📊</div>
+              <p class="text-gray-700 mb-4">View the training presentation:</p>
+              <a href="${currentTrainingRecord.content_url}" target="_blank" rel="noopener noreferrer" class="inline-block bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                📥 Open Presentation
+              </a>
+              <p class="text-sm text-gray-600 mt-4">Review all slides before proceeding to the assessment.</p>
+            </div>
+          </div>
+        `;
+      }
+     
+      showModal('training-content-modal');
+    }
+
+    function closeTrainingContent() {
+      hideModal('training-content-modal');
+      currentTrainingRecord = null;
+    }
+
+    // Assessment functions
+    function startAssessment() {
+      if (!currentTrainingRecord) return;
+     
+      hideModal('training-content-modal');
+     
+      const questions = assessmentQuestions[currentTrainingRecord.framework] || assessmentQuestions['ISO 27001'];
+      const container = document.getElementById('assessment-questions');
+     
+      container.innerHTML = questions.map((q, i) => `
+        <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
+          <p class="font-bold text-gray-900 mb-4">${i + 1}. ${q.question}</p>
+          <div class="space-y-2">
+            ${q.options.map((opt, j) => `
+              <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-white cursor-pointer transition-all">
+                <input type="radio" name="q${i}" value="${j}" required class="w-5 h-5 text-purple-600">
+                <span class="text-gray-700">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+     
+      showModal('assessment-modal');
+    }
+
+    async function submitAssessment(e) {
+      e.preventDefault();
+      if (!currentTrainingRecord) return;
+     
+      const btn = document.getElementById('submit-assessment-btn');
+      btn.disabled = true;
+      btn.textContent = 'Grading...';
+     
+      const questions = assessmentQuestions[currentTrainingRecord.framework] || assessmentQuestions['ISO 27001'];
+      let correctCount = 0;
+     
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && parseInt(selected.value) === q.correct) {
+          correctCount++;
+        }
+      });
+     
+      const score = Math.round((correctCount / questions.length) * 100);
+      const passed = score === 100;
+     
+      btn.disabled = false;
+      btn.textContent = 'Submit Assessment';
+     
+      if (passed) {
+        // Update training record as completed
+        const updateData = {
+          ...currentTrainingRecord,
+          status: 'Completed',
+          score: score,
+          completion_date: new Date().toISOString(),
+          record_type: currentTrainingRecord.record_type || 'training',
+          _source_table: currentTrainingRecord._source_table || 'trainings'
+        };
+        
+        console.log('Submitting assessment for training:', currentTrainingRecord.id, 'with data:', updateData);
+        const result = await storageManager.update(updateData);
+       
+        if (result.isOk) {
+          hideModal('assessment-modal');
+          showCertificate(currentTrainingRecord, score);
+          createConfetti();
+         
+          await sendNotification('completed', `Congratulations! You completed "${currentTrainingRecord.training_name}" with ${score}%!`, currentTrainingRecord.employee_email);
+        } else {
+          showToast('Failed to save assessment: ' + (result.error || 'Unknown error'), 'error');
+        }
+      } else {
+        hideModal('assessment-modal');
+        showFailureMessage(score);
+      }
+    }
+
+    function showFailureMessage(score) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+      modal.innerHTML = `
+        <div class="card-glass rounded-2xl p-8 max-w-md text-center animate-fade-in">
+          <div class="text-6xl mb-4">😔</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">Assessment Not Passed</h3>
+          <p class="text-gray-700 mb-2">Your score: <span class="font-bold text-red-600">${score}%</span></p>
+          <p class="text-gray-700 mb-6">You need 100% to pass. Please review the training material and try again.</p>
+          <button onclick="this.closest('.fixed').remove()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+            Try Again
+          </button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function showCertificate(training, score) {
+       // Get employee name from training record or look it up
+       let employeeName = training.employee_name;
+       if (!employeeName && training.employee_email) {
+         const emp = getEmployees().find(e => e.employee_email === training.employee_email);
+         employeeName = emp ? emp.employee_name : training.employee_email;
+       }
+       
+       document.getElementById('cert-name').textContent = employeeName || 'Certificate Holder';
+       document.getElementById('cert-training').textContent = training.training_name;
+       document.getElementById('cert-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+       document.getElementById('cert-score').textContent = score + '%';
+       showModal('certificate-modal');
+     }
+
+    function viewCertificate(trainingId) {
+      const training = (window.allData || []).find(r => r.id === trainingId);
+      if (training && training.status === 'Completed') {
+        showCertificate(training, training.score);
+      }
+    }
+
+    function downloadCertificate() {
+      const certName = document.getElementById('cert-name').textContent;
+      const certTraining = document.getElementById('cert-training').textContent;
+      const certDate = document.getElementById('cert-date').textContent;
+      const certScore = document.getElementById('cert-score').textContent;
+     
+      // Generate HTML certificate content
+      const certificateHTML = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate of Completion - ${certName}</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 40px;
+      background: white;
+    }
+    .certificate {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px;
+      border: 15px double #d4af37;
+      background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+      text-align: center;
+    }
+    .trophy { font-size: 80px; margin-bottom: 20px; }
+    h1 { font-size: 48px; color: #333; margin: 20px 0; }
+    .divider { height: 3px; width: 150px; background: linear-gradient(90deg, #667eea, #764ba2); margin: 20px auto; }
+    .certifies { font-size: 24px; color: #666; margin: 20px 0; }
+    .name { font-size: 42px; font-weight: bold; color: #333; margin: 30px 0; }
+    .completed { font-size: 24px; color: #666; margin: 20px 0; }
+    .training { font-size: 36px; font-weight: bold; color: #764ba2; margin: 30px 0; }
+    .details { display: flex; justify-content: center; gap: 80px; margin: 40px 0; }
+    .detail-item { text-align: center; }
+    .detail-label { font-size: 14px; color: #999; margin-bottom: 5px; }
+    .detail-value { font-size: 20px; font-weight: bold; color: #333; }
+    .score { color: #22c55e; }
+  </style>
+</head>
+<body>
+  <div class="certificate">
+    <div class="trophy">🏆</div>
+    <h1>Certificate of Completion</h1>
+    <div class="divider"></div>
+    <p class="certifies">This is to certify that</p>
+    <p class="name">${certName}</p>
+    <p class="completed">has successfully completed</p>
+    <p class="training">${certTraining}</p>
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Completion Date</div>
+        <div class="detail-value">${certDate}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Score</div>
+        <div class="detail-value score">${certScore}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+      `;
+     
+      // Create blob and download
+      const blob = new Blob([certificateHTML], { type: 'text/html' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Certificate_${certName.replace(/\s+/g, '_')}_${certTraining.replace(/\s+/g, '_')}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+     
+      showToast('📥 Certificate downloaded successfully!');
+    }
+
+    function createConfetti() {
+      const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe'];
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 2 + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+      }
+    }
+
+    // Control functions
+     async function handleAddControl(e) {
+       e.preventDefault();
+       if ((window.allData || []).length >= 999) {
+         showToast('Maximum limit reached', 'error');
+         return;
+       }
+     
+      const btn = document.getElementById('add-control-btn');
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+     
+      let framework = document.getElementById('control-framework').value;
+     
+      // Handle new framework
+      if (framework === '__ADD_NEW__') {
+        const newFwName = document.getElementById('new-framework-name-control').value.trim();
+        if (!newFwName) {
+          showToast('Please enter a framework name', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Add Control';
+          return;
+        }
+       
+        const added = await addNewFramework(newFwName);
+        if (!added) {
+          btn.disabled = false;
+          btn.textContent = 'Add Control';
+          return;
+        }
+        framework = newFwName;
+      }
+     
+      const result = await storageManager.create({
+         record_type: 'control',
+         control_id: document.getElementById('control-id').value,
+         control_name: document.getElementById('control-name').value,
+         framework: framework,
+         control_status: document.getElementById('control-status').value
+       });
+     
+      btn.disabled = false;
+      btn.textContent = 'Add Control';
+     
+      if (result.isOk) {
+        showToast('✅ Control added successfully!');
+        hideModal('add-control-modal');
+        document.getElementById('add-control-form').reset();
+        document.getElementById('new-framework-section-control').classList.add('hidden');
+      } else {
+        showToast('Failed to add control', 'error');
+      }
+    }
+
+    // Compliance Tab
+    let currentComplianceFilter = null;
+
+    function filterComplianceByFramework(framework) {
+      currentComplianceFilter = framework;
+      switchTab('compliance');
+    }
+
+    function renderControls() {
+      const container = document.getElementById('controls-list');
+      let controls = getControls();
+     
+      // Apply filter if set
+      if (currentComplianceFilter) {
+        controls = controls.filter(c => c.framework === currentComplianceFilter);
+      }
+     
+      if (controls.length === 0) {
+        const msg = currentComplianceFilter
+          ? `No ${currentComplianceFilter} controls yet.`
+          : 'No controls yet.';
+        container.innerHTML = `<p class="text-gray-500 text-center py-12 text-lg">${msg}</p>`;
+       
+        // Add clear filter button if filter is active
+        if (currentComplianceFilter) {
+          container.innerHTML += `
+            <div class="text-center mt-4">
+              <button onclick="clearComplianceFilter()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-xl font-medium transition-all">
+                Clear Filter
+              </button>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      let html = '';
+     
+      // Show filter badge if active
+      if (currentComplianceFilter) {
+        html += `
+          <div class="mb-6 flex items-center gap-3">
+            <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl font-medium">
+              Filtered by: ${currentComplianceFilter}
+            </span>
+            <button onclick="clearComplianceFilter()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-xl font-medium transition-all">
+              Clear Filter
+            </button>
+          </div>
+        `;
+      }
+
+      html += controls.map(ctrl => {
+        const statusColors = {
+          'Compliant': 'bg-green-500',
+          'Partial': 'bg-yellow-500',
+          'Non-Compliant': 'bg-red-500'
+        };
+       
+        return `
+          <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 shadow hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-mono font-bold text-purple-700">${ctrl.control_id}</span>
+                  <span class="text-xs px-3 py-1 rounded-full ${statusColors[ctrl.control_status]} text-white font-medium">${ctrl.control_status}</span>
+                </div>
+                <h4 class="font-bold text-gray-900 mb-1">${ctrl.control_name}</h4>
+                <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">${ctrl.framework}</span>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editControl('${ctrl.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  ✏️ Edit
+                </button>
+                <button onclick="confirmDeleteControl('${ctrl.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+     
+      container.innerHTML = html;
+    }
+
+    function clearComplianceFilter() {
+      currentComplianceFilter = null;
+      renderControls();
+    }
+
+    // Vendor functions
+    async function handleAddVendor(e) {
+      e.preventDefault();
+      if ((window.allData || []).length >= 999) {
+        showToast('Maximum limit reached', 'error');
+        return;
+      }
+     
+      const btn = document.getElementById('add-vendor-btn');
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+     
+      try {
+        // Handle certificate file upload
+        const certFile = document.getElementById('vendor-cert-file').files[0];
+        let certFileName = '';
+       
+        if (certFile) {
+          if (certFile.size > 10 * 1024 * 1024) {
+            showToast('Certificate file must be less than 10MB', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Add Vendor';
+            return;
+          }
+         
+          certFileName = certFile.name;
+        }
+       
+        const result = await storageManager.create({
+           record_type: 'vendor',
+           vendor_name: document.getElementById('vendor-name').value,
+           vendor_email: document.getElementById('vendor-email').value,
+           vendor_service: document.getElementById('vendor-service').value,
+           risk_score: parseInt(document.getElementById('vendor-risk').value),
+           certificate_name: document.getElementById('vendor-cert-name').value,
+           expiry_date: document.getElementById('vendor-expiry').value,
+           certificate_file_name: certFileName,
+           vendor_poc: document.getElementById('vendor-poc').value,
+           internal_owner: document.getElementById('vendor-internal-owner').value
+         });
+       
+        btn.disabled = false;
+        btn.textContent = 'Add Vendor';
+       
+        if (result.isOk) {
+          showToast('✅ Vendor added successfully!');
+          hideModal('add-vendor-modal');
+          document.getElementById('add-vendor-form').reset();
+        } else {
+          showToast('Failed to add vendor: ' + (result.error?.message || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        btn.disabled = false;
+        btn.textContent = 'Add Vendor';
+        showToast('Error adding vendor: ' + error.message, 'error');
+      }
+    }
+   
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderVendors() {
+      const container = document.getElementById('vendor-list');
+      const vendors = getVendors();
+     
+      if (vendors.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12 text-lg">No vendors yet.</p>';
+        return;
+      }
+
+      container.innerHTML = vendors.map(vendor => {
+        const riskColor = vendor.risk_score >= 70 ? 'text-red-600' : vendor.risk_score >= 40 ? 'text-orange-600' : 'text-green-600';
+        const riskBg = vendor.risk_score >= 70 ? 'bg-red-100' : vendor.risk_score >= 40 ? 'bg-orange-100' : 'bg-green-100';
+        let expiryDate, daysUntilExpiry, isExpiringSoon, isExpired;
+        try {
+          expiryDate = new Date(vendor.expiry_date);
+          if (isNaN(expiryDate.getTime())) throw new Error('Invalid date');
+          daysUntilExpiry = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+          isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+          isExpired = daysUntilExpiry <= 0;
+        } catch (e) {
+          expiryDate = new Date();
+          daysUntilExpiry = -1;
+          isExpiringSoon = false;
+          isExpired = true;
+        }
+       
+        return `
+          <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 shadow hover:shadow-lg transition-all border-2 ${isExpired ? 'border-red-400' : isExpiringSoon ? 'border-orange-400' : 'border-green-200'}">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="font-bold text-gray-900 text-xl">${vendor.vendor_name}</h4>
+                    ${isExpired ? '<span class="text-xs px-3 py-1 rounded-full bg-red-500 text-white font-medium">⚠️ Expired</span>' :
+                      isExpiringSoon ? '<span class="text-xs px-3 py-1 rounded-full bg-orange-500 text-white font-medium">⏰ Expiring Soon</span>' : ''}
+                  </div>
+                  <p class="text-sm text-gray-600 mb-1">📧 ${vendor.vendor_email}</p>
+                  <p class="text-sm text-gray-700 font-medium mb-2">🔧 ${vendor.vendor_service || 'N/A'}</p>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="text-xs bg-purple-200 text-purple-800 px-3 py-1 rounded-full">📜 ${vendor.certificate_name || 'N/A'}</span>
+                    <span class="text-xs ${isExpired ? 'bg-red-200 text-red-800' : isExpiringSoon ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'} px-3 py-1 rounded-full">
+                      📅 Expires: ${expiryDate.toLocaleDateString()}
+                    </span>
+                    ${vendor.certificate_file_name ? `
+                      <span class="text-xs bg-blue-200 text-blue-800 px-3 py-1 rounded-full">📄 ${vendor.certificate_file_name}</span>
+                    ` : ''}
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="text-center ${riskBg} rounded-xl p-4">
+                    <p class="text-3xl font-bold ${riskColor}">${vendor.risk_score}</p>
+                    <p class="text-xs text-gray-600 mt-1">Risk Score</p>
+                  </div>
+                </div>
+              </div>
+             
+              <div class="bg-white/60 rounded-lg p-4 grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-xs text-gray-600 mb-1">👤 Vendor Contact</p>
+                  <p class="text-sm font-semibold text-gray-900">${vendor.vendor_poc || 'N/A'}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600 mb-1">👨‍💼 Our Owner</p>
+                  <p class="text-sm font-semibold text-gray-900">${vendor.internal_owner ? (getEmployees().find(e => e.employee_email === vendor.internal_owner) || {}).employee_name || vendor.internal_owner : 'N/A'}</p>
+                </div>
+              </div>
+             
+              <div class="flex items-center gap-2">
+                <button onclick="editVendor('${vendor.id}')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  ✏️ Edit
+                </button>
+                <button onclick="confirmDeleteVendor('${vendor.id}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Department management
+    function getDepartments() {
+      const deptRecords = getRecordsByType('department');
+      const defaultDepts = ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Operations'];
+      const customDepts = deptRecords.map(d => d.department_name);
+      return [...defaultDepts, ...customDepts];
+    }
+
+    function updateDepartmentDropdowns() {
+      try {
+        const departments = getDepartments();
+        const selects = ['emp-dept', 'edit-emp-dept'];
+       
+        selects.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            const currentValue = select.value;
+            let html = '<option value="">Select Department</option>';
+            departments.forEach(dept => {
+              html += `<option value="${dept}">${dept}</option>`;
+            });
+            html += '<option value="__ADD_NEW__">➕ Add New Department</option>';
+            select.innerHTML = html;
+            if (currentValue && departments.includes(currentValue)) {
+              select.value = currentValue;
+            }
+            console.log('Updated select:', id, 'with', departments.length, 'departments');
+          }
+        });
+      } catch (err) {
+        console.error('Error updating department dropdowns:', err);
+      }
+    }
+   
+    // Will be called during initApp()
+
+    function handleDepartmentChange(select) {
+      const newDeptSection = document.getElementById('new-dept-section');
+      if (select.value === '__ADD_NEW__') {
+        newDeptSection.classList.remove('hidden');
+        document.getElementById('new-dept-name').required = true;
+      } else {
+        newDeptSection.classList.add('hidden');
+        document.getElementById('new-dept-name').required = false;
+      }
+    }
+
+    async function addNewDepartment(name) {
+      // Validate input
+      if (!name || name.trim() === '') {
+        showToast('Department name cannot be empty', 'error');
+        return false;
+      }
+      
+      if (window.allData.length >= 999) {
+        showToast('Maximum limit reached', 'error');
+        return false;
+      }
+     
+      const result = await storageManager.create({
+        record_type: 'department',
+        department_name: name.trim()
+      });
+      
+      if (result.isOk) {
+        showToast('✅ Department added!');
+        return true;
+      } else {
+        showToast('Failed to add department', 'error');
+        return false;
+      }
+    }
+
+    // Framework management
+    function getFrameworks() {
+      const fwRecords = getRecordsByType('framework');
+      const defaultFws = ['ISO 27001', 'NIST', 'SOC 2', 'GDPR', 'HIPAA', 'PCI DSS'];
+      const customFws = fwRecords.map(f => f.framework_name);
+      return [...defaultFws, ...customFws];
+    }
+
+    function updateFrameworkDropdowns() {
+      try {
+        const frameworks = getFrameworks();
+        const selects = [
+          'control-framework', 'edit-control-framework',
+          'training-framework', 'edit-training-framework'
+        ];
+       
+        selects.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            const currentValue = select.value;
+            let html = '<option value="">Select framework...</option>';
+            frameworks.forEach(fw => {
+              html += `<option value="${fw}">${fw}</option>`;
+            });
+            html += '<option value="__ADD_NEW__">➕ Add New Framework</option>';
+            select.innerHTML = html;
+            if (currentValue) select.value = currentValue;
+            console.log('Updated select:', id, 'with', frameworks.length, 'frameworks');
+          }
+        });
+      } catch (err) {
+        console.error('Error updating framework dropdowns:', err);
+      }
+    }
+
+    function handleFrameworkChange(select, context) {
+      const newFwSection = document.getElementById(`new-framework-section-${context}`);
+      if (select.value === '__ADD_NEW__') {
+        newFwSection.classList.remove('hidden');
+        document.getElementById(`new-framework-name-${context}`).required = true;
+      } else {
+        newFwSection.classList.add('hidden');
+        document.getElementById(`new-framework-name-${context}`).required = false;
+      }
+    }
+
+    async function addNewFramework(name) {
+       if ((window.allData || []).length >= 999) {
+         showToast('Maximum limit reached', 'error');
+         return false;
+       }
+     
+      const result = await storageManager.create({
+        record_type: 'framework',
+        framework_name: name
+      });
+      
+      if (result.isOk) {
+        showToast('✅ Framework added!');
+        return true;
+      } else {
+        showToast('Failed to add framework', 'error');
+        return false;
+      }
+    }
+
+    // Update employee dropdowns
+    function updateEmployeeDropdowns() {
+      try {
+        const employees = getEmployees();
+        const selects = ['training-employee', 'training-supervisor', 'vendor-internal-owner', 'edit-vendor-internal-owner'];
+       
+        selects.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            const isSuper = id === 'training-supervisor';
+            const isVendor = id.includes('vendor');
+            let html = isSuper ? '<option value="">No supervisor</option>' :
+                                 isVendor ? '<option value="">Select employee...</option>' :
+                                 '<option value="">Choose employee...</option>';
+            employees.forEach(emp => {
+              html += `<option value="${emp.employee_email}">${emp.employee_name} (${emp.department})</option>`;
+            });
+            select.innerHTML = html;
+            console.log('Updated select:', id, 'with', employees.length, 'employees');
+          }
+        });
+       
+        updateDepartmentDropdowns();
+        updateFrameworkDropdowns();
+        updateEmployeeViewSelector();
+      } catch (err) {
+        console.error('Error updating employee dropdowns:', err);
+      }
+    }
+
+    // Export reports
+    function exportReport(type, format) {
+      const date = new Date().toISOString().split('T')[0];
+      let data, filename, content;
+     
+      // Prepare data based on report type
+      switch(type) {
+        case 'training':
+          data = getTrainings();
+          filename = `Training_Report_${date}`;
+          break;
+        case 'compliance':
+          data = getControls();
+          filename = `Compliance_Report_${date}`;
+          break;
+        case 'vendors':
+          data = getVendors();
+          filename = `Vendor_Report_${date}`;
+          break;
+        case 'full':
+          data = allData;
+          filename = `Full_System_Report_${date}`;
+          break;
+      }
+     
+      // Generate content based on format
+      switch(format) {
+        case 'excel':
+          content = generateExcel(data);
+          downloadFile(content, filename + '.xls', 'application/vnd.ms-excel');
+          break;
+        case 'csv':
+          content = generateCSV(data);
+          downloadFile(content, filename + '.csv', 'text/csv');
+          break;
+        case 'pdf':
+          content = generatePDF(data, type);
+          downloadFile(content, filename + '.pdf', 'application/pdf');
+          break;
+        case 'txt':
+          content = generateTXT(data, type);
+          downloadFile(content, filename + '.txt', 'text/plain');
+          break;
+      }
+     
+      showToast(`📥 ${type.charAt(0).toUpperCase() + type.slice(1)} report exported as ${format.toUpperCase()}!`);
+    }
+
+    function generateExcel(data) {
+      if (data.length === 0) return 'No data available';
+     
+      const keys = Object.keys(data[0]);
+      let content = keys.join('\t') + '\n';
+     
+      data.forEach(record => {
+        const values = keys.map(key => {
+          const val = record[key] || '';
+          return String(val).replace(/\t/g, ' ');
+        });
+        content += values.join('\t') + '\n';
+      });
+     
+      return content;
+    }
+
+    function generateCSV(data) {
+      if (data.length === 0) return 'No data available';
+     
+      const keys = Object.keys(data[0]);
+      let content = keys.join(',') + '\n';
+     
+      data.forEach(record => {
+        const values = keys.map(key => {
+          const val = record[key] || '';
+          const escaped = String(val).replace(/"/g, '""');
+          return `"${escaped}"`;
+        });
+        content += values.join(',') + '\n';
+      });
+     
+      return content;
+    }
+
+    function generatePDF(data, type) {
+      let content = `${type.toUpperCase()} REPORT\n`;
+      content += `Generated: ${new Date().toLocaleString()}\n`;
+      content += `Total Records: ${data.length}\n`;
+      content += '='.repeat(80) + '\n\n';
+     
+      data.forEach((record, index) => {
+        content += `Record ${index + 1}:\n`;
+        content += '-'.repeat(40) + '\n';
+        Object.keys(record).forEach(key => {
+          if (key !== '__backendId') {
+            content += `${key}: ${record[key]}\n`;
+          }
+        });
+        content += '\n';
+      });
+     
+      return content;
+    }
+
+    function generateTXT(data, type) {
+      let content = `${type.toUpperCase()} REPORT\n`;
+      content += `Generated: ${new Date().toLocaleString()}\n`;
+      content += `Total Records: ${data.length}\n`;
+      content += '='.repeat(80) + '\n\n';
+     
+      data.forEach((record, index) => {
+        content += `Record #${index + 1}\n`;
+        Object.keys(record).forEach(key => {
+          if (key !== '__backendId') {
+            content += `  ${key}: ${record[key]}\n`;
+          }
+        });
+        content += '\n';
+      });
+     
+      return content;
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    // Delete confirmation functions
+    function confirmDeleteEmployee(id) {
+      console.log('Delete employee ID:', id);
+      console.log('AllData:', window.allData);
+      const emp = window.allData.find(r => String(r.id) === String(id));
+      if (!emp) {
+        alert('Employee record not found. ID: ' + id);
+        console.log('Available IDs:', window.allData.map(r => r.id));
+        return;
+      }
+      document.getElementById('delete-message').textContent = `Are you sure you want to delete employee "${emp.employee_name}"? This action cannot be undone.`;
+      pendingDeleteRecord = emp; // Store the full record with _source_table
+      pendingDeleteAction = () => deleteEmployee(id);
+      showModal('delete-confirmation-modal');
+    }
+
+    function confirmDeleteTraining(id) {
+      const training = window.allData.find(r => String(r.id) === String(id));
+      if (!training) {
+        alert('Training record not found');
+        return;
+      }
+      document.getElementById('delete-message').textContent = `Are you sure you want to delete training "${training.training_name}"? This action cannot be undone.`;
+      pendingDeleteRecord = training; // Store the full record with _source_table
+      pendingDeleteAction = () => deleteTraining(id);
+      showModal('delete-confirmation-modal');
+    }
+
+    async function confirmDeleteControl(id) {
+      try {
+        // Load the control record directly from the database
+        const { data, error } = await supabaseClient
+          .from('controls')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error || !data) {
+          console.error('Failed to load control for deletion:', error);
+          showToast('Failed to load control data', 'error');
+          return;
+        }
+        
+        const ctrl = data;
+        console.log('Loaded control for deletion:', ctrl);
+        
+        // Store the complete record with database metadata
+        pendingDeleteRecord = ctrl;
+        pendingDeleteRecord._source_table = 'controls';
+        pendingDeleteRecord.record_type = 'control';
+        
+        document.getElementById('delete-message').textContent = `Are you sure you want to delete control "${ctrl.control_name}"? This action cannot be undone.`;
+        pendingDeleteAction = () => deleteControl(id);
+        showModal('delete-confirmation-modal');
+      } catch (err) {
+        console.error('Error in confirmDeleteControl:', err);
+        showToast('Error loading control data', 'error');
+      }
+    }
+
+    async function confirmDeleteVendor(id) {
+      try {
+        // Load the vendor record directly from the database
+        const { data, error } = await supabaseClient
+          .from('vendors')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error || !data) {
+          console.error('Failed to load vendor for deletion:', error);
+          showToast('Failed to load vendor data', 'error');
+          return;
+        }
+        
+        const vendor = data;
+        console.log('Loaded vendor for deletion:', vendor);
+        
+        // Store the complete record with database metadata
+        pendingDeleteRecord = vendor;
+        pendingDeleteRecord._source_table = 'vendors';
+        pendingDeleteRecord.record_type = 'vendor';
+        
+        document.getElementById('delete-message').textContent = `Are you sure you want to delete vendor "${vendor.vendor_name}"? This action cannot be undone.`;
+        pendingDeleteAction = () => deleteVendor(id);
+        showModal('delete-confirmation-modal');
+      } catch (err) {
+        console.error('Error in confirmDeleteVendor:', err);
+        showToast('Error loading vendor data', 'error');
+      }
+    }
+
+    async function confirmDelete() {
+      const btn = document.getElementById('confirm-delete-btn');
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+     
+      if (pendingDeleteAction) {
+        await pendingDeleteAction();
+        pendingDeleteAction = null;
+      }
+     
+      btn.disabled = false;
+      btn.textContent = 'Delete';
+      hideModal('delete-confirmation-modal');
+    }
+
+    // Delete functions
+    async function deleteEmployee(id) {
+      // Use stored record from confirmation dialog if available
+      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      if (record) {
+        const result = await storageManager.delete(id, record);
+        if (result.isOk) {
+          showToast('✅ Employee deleted successfully!');
+        } else {
+          showToast('Failed to delete employee: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+
+    async function deleteTraining(id) {
+      // Use stored record from confirmation dialog if available
+      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      if (record) {
+        console.log('Deleting training:', id, 'record:', record);
+        const result = await storageManager.delete(id, record);
+        console.log('Delete result:', result);
+        if (result.isOk) {
+          showToast('✅ Training deleted successfully!');
+        } else {
+          showToast('Failed to delete training: ' + (result.error || 'Unknown error'), 'error');
+        }
+      } else {
+        console.error('Training record not found:', id);
+        showToast('Training record not found', 'error');
+      }
+    }
+
+    async function deleteControl(id) {
+      // Use stored record from confirmation dialog if available
+      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      if (record) {
+        const result = await storageManager.delete(id, record);
+        if (result.isOk) {
+          showToast('✅ Control deleted successfully!');
+        } else {
+          showToast('Failed to delete control: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+
+    async function deleteVendor(id) {
+      // Use stored record from confirmation dialog if available
+      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      if (record) {
+        const result = await storageManager.delete(id, record);
+        if (result.isOk) {
+          showToast('✅ Vendor deleted successfully!');
+        } else {
+          showToast('Failed to delete vendor: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+
+    // Edit functions
+    function editEmployee(id) {
+      const emp = window.allData.find(r => String(r.id) === String(id));
+      if (!emp) return;
+     
+      // Store the complete record including _source_table
+      window.currentEditRecord = emp;
+     
+      document.getElementById('edit-emp-id').value = emp.id;
+      document.getElementById('edit-emp-name').value = emp.employee_name;
+      document.getElementById('edit-emp-email').value = emp.employee_email;
+      document.getElementById('edit-emp-dept').value = emp.department;
+     
+      showModal('edit-employee-modal');
+    }
+
+    async function handleEditEmployee(e) {
+      e.preventDefault();
+      const btn = document.getElementById('edit-emp-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+     
+      const id = document.getElementById('edit-emp-id').value;
+      // Use stored complete record if available
+      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+     
+      if (record) {
+        const result = await storageManager.update({
+          ...record,
+          record_type: 'employee',
+          employee_name: document.getElementById('edit-emp-name').value,
+          employee_email: document.getElementById('edit-emp-email').value,
+          department: document.getElementById('edit-emp-dept').value
+        });
+       
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        window.currentEditRecord = null;
+       
+        if (result.isOk) {
+          showToast('✅ Employee updated successfully!');
+          hideModal('edit-employee-modal');
+        } else {
+          showToast('Failed to update employee: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+
+    function editTraining(id) {
+      const training = window.allData.find(r => String(r.id) === String(id));
+      if (!training) return;
+      
+      // Store the complete record including _source_table
+      window.currentEditRecord = training;
+     
+      document.getElementById('edit-training-id').value = training.id;
+      document.getElementById('edit-training-name').value = training.training_name;
+      document.getElementById('edit-training-framework').value = training.framework;
+      document.getElementById('edit-training-content-type').value = training.content_type;
+      document.getElementById('edit-training-content-url').value = training.content_url;
+      document.getElementById('edit-training-due').value = training.due_date;
+     
+      showModal('edit-training-modal');
+    }
+
+    async function handleEditTraining(e) {
+      e.preventDefault();
+      const btn = document.getElementById('edit-training-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+     
+      const id = document.getElementById('edit-training-id').value;
+      // Use stored complete record if available
+      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+     
+      if (record) {
+        const updateData = {
+          ...record,
+          record_type: 'training',
+          training_name: document.getElementById('edit-training-name').value,
+          framework: document.getElementById('edit-training-framework').value,
+          content_type: document.getElementById('edit-training-content-type').value,
+          content_url: document.getElementById('edit-training-content-url').value,
+          due_date: document.getElementById('edit-training-due').value
+        };
+        console.log('Updating training:', id, 'with data:', updateData);
+        const result = await storageManager.update(updateData);
+        console.log('Update result:', result);
+       
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        window.currentEditRecord = null;
+       
+        if (result.isOk) {
+          showToast('✅ Training updated successfully!');
+          hideModal('edit-training-modal');
+        } else {
+          showToast('Failed to update training: ' + (result.error || 'Unknown error'), 'error');
+        }
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        window.currentEditRecord = null;
+        console.error('Training record not found:', id);
+        showToast('Training record not found', 'error');
+      }
+    }
+
+    async function editControl(id) {
+      try {
+        // Load the control record directly from the database
+        const { data, error } = await supabaseClient
+          .from('controls')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error || !data) {
+          console.error('Failed to load control:', error);
+          showToast('Failed to load control data', 'error');
+          return;
+        }
+        
+        const ctrl = data;
+        console.log('Loaded control from DB:', ctrl);
+        
+        // Store the complete record with database metadata
+        window.currentEditRecord = ctrl;
+        window.currentEditRecord._source_table = 'controls';
+        window.currentEditRecord.record_type = 'control';
+       
+        document.getElementById('edit-control-backend-id').value = ctrl.id;
+        document.getElementById('edit-control-id').value = ctrl.control_id || '';
+        document.getElementById('edit-control-name').value = ctrl.control_name || '';
+        const frameworkSelect = document.getElementById('edit-control-framework');
+        if (frameworkSelect) {
+          const currentFramework = ctrl.framework || '';
+          let hasOption = false;
+          for (let i = 0; i < frameworkSelect.options.length; i++) {
+            if (frameworkSelect.options[i].value === currentFramework) {
+              hasOption = true;
+              break;
+            }
+          }
+          if (currentFramework && !hasOption) {
+            const opt = document.createElement('option');
+            opt.value = currentFramework;
+            opt.textContent = currentFramework;
+            frameworkSelect.appendChild(opt);
+          }
+          frameworkSelect.value = currentFramework;
+        }
+        document.getElementById('edit-control-status').value = ctrl.control_status || '';
+       
+        showModal('edit-control-modal');
+      } catch (err) {
+        console.error('Error in editControl:', err);
+        showToast('Error loading control data', 'error');
+      }
+    }
+
+    async function handleEditControl(e) {
+      e.preventDefault();
+      const btn = document.getElementById('edit-control-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+     
+      const id = document.getElementById('edit-control-backend-id').value;
+      // Use stored complete record if available
+      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+     
+      if (record) {
+        const result = await storageManager.update({
+          ...record,
+          record_type: 'control',
+          control_id: document.getElementById('edit-control-id').value,
+          control_name: document.getElementById('edit-control-name').value,
+          framework: document.getElementById('edit-control-framework').value,
+          control_status: document.getElementById('edit-control-status').value
+        });
+       
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        window.currentEditRecord = null;
+       
+        if (result.isOk) {
+          showToast('✅ Control updated successfully!');
+          hideModal('edit-control-modal');
+        } else {
+          showToast('Failed to update control: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+
+    async function editVendor(id) {
+      try {
+        // Load the vendor record directly from the database
+        const { data, error } = await supabaseClient
+          .from('vendors')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error || !data) {
+          console.error('Failed to load vendor:', error);
+          showToast('Failed to load vendor data', 'error');
+          return;
+        }
+        
+        const vendor = data;
+        console.log('Loaded vendor from DB:', vendor);
+        
+        // Store the complete record with database metadata
+        window.currentEditRecord = vendor;
+        window.currentEditRecord._source_table = 'vendors';
+        window.currentEditRecord.record_type = 'vendor';
+       
+        document.getElementById('edit-vendor-backend-id').value = vendor.id || '';
+        document.getElementById('edit-vendor-name').value = vendor.vendor_name || '';
+        document.getElementById('edit-vendor-email').value = vendor.vendor_email || '';
+        document.getElementById('edit-vendor-service').value = vendor.vendor_service || '';
+        document.getElementById('edit-vendor-risk').value = vendor.risk_score != null ? vendor.risk_score : '';
+        document.getElementById('edit-vendor-cert-name').value = vendor.certificate_name || '';
+        let expiryValue = '';
+        if (vendor.expiry_date) {
+          const d = new Date(vendor.expiry_date);
+          if (!isNaN(d.getTime())) {
+            expiryValue = d.toISOString().slice(0, 10);
+          } else {
+            expiryValue = vendor.expiry_date;
+          }
+        }
+        document.getElementById('edit-vendor-expiry').value = expiryValue;
+        document.getElementById('edit-vendor-poc').value = vendor.vendor_poc || '';
+        const ownerSelect = document.getElementById('edit-vendor-internal-owner');
+        const ownerValue = vendor.internal_owner || '';
+        if (ownerSelect) {
+          let hasOwner = false;
+          for (let i = 0; i < ownerSelect.options.length; i++) {
+            if (ownerSelect.options[i].value === ownerValue) {
+              hasOwner = true;
+              break;
+            }
+          }
+          if (ownerValue && !hasOwner) {
+            const opt = document.createElement('option');
+            opt.value = ownerValue;
+            opt.textContent = ownerValue;
+            ownerSelect.appendChild(opt);
+          }
+          ownerSelect.value = ownerValue;
+        }
+       
+        const certInfo = document.getElementById('edit-vendor-current-cert');
+        if (certInfo) {
+          if (vendor.certificate_file_name) {
+            certInfo.textContent = `Current: ${vendor.certificate_file_name}`;
+            certInfo.className = 'mb-2 text-sm text-green-600 font-medium';
+          } else {
+            certInfo.textContent = 'No certificate uploaded';
+            certInfo.className = 'mb-2 text-sm text-gray-500';
+          }
+        }
+       
+        showModal('edit-vendor-modal');
+      } catch (err) {
+        console.error('Error in editVendor:', err);
+        showToast('Error loading vendor data', 'error');
+      }
+    }
+
+    async function handleEditVendor(e) {
+      e.preventDefault();
+      const btn = document.getElementById('edit-vendor-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+     
+      const id = document.getElementById('edit-vendor-backend-id').value;
+      // Use stored complete record if available
+      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+     
+      if (record) {
+        // Handle certificate file upload if new file selected
+        const certFile = document.getElementById('edit-vendor-cert-file').files[0];
+        let certFileName = record.certificate_file_name || '';
+       
+        if (certFile) {
+          if (certFile.size > 10 * 1024 * 1024) {
+            showToast('Certificate file must be less than 10MB', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
+            window.currentEditRecord = null;
+            return;
+          }
+         
+          certFileName = certFile.name;
+        }
+       
+        const result = await storageManager.update({
+          ...record,
+          record_type: 'vendor',
+          vendor_name: document.getElementById('edit-vendor-name').value,
+          vendor_email: document.getElementById('edit-vendor-email').value,
+          vendor_service: document.getElementById('edit-vendor-service').value,
+          risk_score: parseInt(document.getElementById('edit-vendor-risk').value),
+          certificate_name: document.getElementById('edit-vendor-cert-name').value,
+          expiry_date: document.getElementById('edit-vendor-expiry').value,
+          certificate_file_name: certFileName,
+          vendor_poc: document.getElementById('edit-vendor-poc').value,
+          internal_owner: document.getElementById('edit-vendor-internal-owner').value
+        });
+       
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        window.currentEditRecord = null;
+       
+        if (result.isOk) {
+          showToast('✅ Vendor updated successfully!');
+          hideModal('edit-vendor-modal');
+        } else {
+          showToast('Failed to update vendor: ' + (result.error || 'Unknown error'), 'error');
+        }
+      }
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd08ba8a70bde8e',t:'MTc2ODI2MTcxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

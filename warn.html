@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>⚠️Warning!</title>
+    <link rel="shortcut icon" href="1.jpg" type="image/x-icon"/>
+</head>
+<body>
+    <b style="background-color: red;"><h1>You are not allowed to save images on ScheduGraph.</h1>
+    <p>Don't violate this policy.</p></b>
+    <input type="text" id="username" placeholder="Enter Username" autocomplete="additional-name">
+    <button id="disabled" onclick="deleteAccount(document.getElementById('username').value)">Go Back &LeftArrow;</button>
+    <script>
+        function deleteAccount(user) {
+            users = ['MFFX_C369856'];
+            if (user in users) {
+                delete user in users;
+                window.location.replace('file:///C:/Users/tosba/OneDrive/Documents/Projects/project.html')
+            } else {
+            }
+        };
+    </script>
+</body>
+</html>
