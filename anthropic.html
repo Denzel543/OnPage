@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D City Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+        
+        #help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #D97356;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        #help-button:hover {
+            background: #c85a3f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+        
+        #help-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #help-modal h2 {
+            margin: 0 0 20px 0;
+            color: #D97356;
+        }
+        
+        .help-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border-left: 4px solid #D97356;
+        }
+        
+        .help-section h3 {
+            margin: 0 0 10px 0;
+            color: #D97356;
+        }
+        
+        .help-section ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        #close-help {
+            background: #D97356;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        #dialogue-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+        }
+        
+        #dialogue-box h3 {
+            margin: 0 0 10px 0;
+            color: #D97356;
+        }
+        
+        #dialogue-content {
+            margin: 10px 0;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .dialogue-option {
+            background: #f0f0f0;
+            border: 2px solid #D97356;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .dialogue-option:hover {
+            background: #D97356;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        #interaction-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        #floor-indicator {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+        
+        .floating-text {
+            position: absolute;
+            color: #ff0;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 2s ease-out forwards;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="ui-overlay">
+        <h2>🏙️ 3D City</h2>
+        <p style="font-size: 16px;">Explore the city!</p>
+        <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">Press H for help</p>
+    </div>
+    
+    <button id="help-button">❓ Help</button>
+    
+    <div id="help-modal">
+        <h2>🏙️ Welcome to 3D City!</h2>
+        
+        <div class="help-section">
+            <h3>🎮 Controls</h3>
+            <ul>
+                <li><strong>WASD</strong> - Move around</li>
+                <li><strong>Mouse</strong> - Look around (click to lock)</li>
+                <li><strong>Arrow Keys</strong> - Rotate camera (↑↓ for vertical, ←→ for horizontal)</li>
+                <li><strong>E</strong> - Interact with objects/people</li>
+                <li><strong>SPACE</strong> - Jump</li>
+                <li><strong>ESC</strong> - Close dialogs/release mouse</li>
+                <li><strong>H</strong> - Toggle this help menu</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <h3>🏢 Buildings & Floors</h3>
+            <ul>
+                <li>The city has multiple buildings with several floors</li>
+                <li>Use <strong>stairs</strong> to move between floors</li>
+                <li>Step into <strong>elevators</strong> and press E to ride</li>
+                <li>Each building has different rooms to explore</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <h3>👥 Interactions</h3>
+            <ul>
+                <li>Talk to <strong>anyone</strong> - Press E near any person (co-founders and NPCs!)</li>
+                <li>Use <strong>doors</strong> - Press E to open/close (walk through when open)</li>
+                <li>Drive <strong>cars</strong> - Press E near a car to enter/exit</li>
+                <li>Find <strong>hidden items</strong> - Coffee, plants, decorations</li>
+                <li>Watch <strong>NPCs</strong> move around the city</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <h3>🎯 Things to Do</h3>
+            <ul>
+                <li>Visit the office on Floor 2</li>
+                <li>Explore the rooftop garden on Floor 3</li>
+                <li>Find and drive all 8 colored cars</li>
+                <li>Chat with all 6 co-founders AND the 30 city residents</li>
+                <li>Discover the coffee shop</li>
+                <li>Drive around the entire city!</li>
+            </ul>
+        </div>
+        
+        <button id="close-help">Got it! Let's explore 🚀</button>
+    </div>
+    
+    <div id="floor-indicator">Floor: 1</div>
+    
+    <div id="dialogue-box">
+        <h3 id="dialogue-name">Name</h3>
+        <div id="dialogue-content">Content</div>
+        <div id="dialogue-options"></div>
+    </div>
+    
+    <div id="interaction-prompt"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb);
+        scene.fog = new THREE.Fog(0x87ceeb, 50, 150);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.6, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const sunLight = new THREE.DirectionalLight(0xffffcc, 1.0);
+        sunLight.position.set(50, 100, 50);
+        sunLight.castShadow = true;
+        sunLight.shadow.camera.near = 0.1;
+        sunLight.shadow.camera.far = 200;
+        sunLight.shadow.camera.left = -100;
+        sunLight.shadow.camera.right = 100;
+        sunLight.shadow.camera.top = 100;
+        sunLight.shadow.camera.bottom = -100;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        scene.add(sunLight);
+        
+        // Add sky dome
+        const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+        const skyMaterial = new THREE.MeshBasicMaterial({
+            color: 0x87ceeb,
+            side: THREE.BackSide
+        });
+        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+        scene.add(sky);
+        
+        // Add clouds
+        for (let i = 0; i < 20; i++) {
+            const cloud = new THREE.Mesh(
+                new THREE.SphereGeometry(10 + Math.random() * 10, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 })
+            );
+            cloud.position.set(
+                Math.random() * 400 - 200,
+                50 + Math.random() * 50,
+                Math.random() * 400 - 200
+            );
+            scene.add(cloud);
+        }
+        
+        // Collision system (declare early)
+        const colliders = [];
+        
+        function addCollider(x, y, z, width, height, depth, type = 'wall') {
+            colliders.push({
+                min: new THREE.Vector3(x - width/2, y, z - depth/2),
+                max: new THREE.Vector3(x + width/2, y + height, z + depth/2),
+                type: type
+            });
+        }
+        
+        // Materials
+        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
+        const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xe0e0e0 });
+        const windowMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x6eb5ff, 
+            transparent: true, 
+            opacity: 0.6,
+            metalness: 0.5,
+            roughness: 0.1
+        });
+        const doorMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        const grassMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
+        
+        // Ground
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(200, 200),
+            groundMaterial
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Add ground collider
+        addCollider(0, -0.5, 0, 200, 1, 200, 'ground');
+        
+        // Add grass patches
+        for (let i = 0; i < 20; i++) {
+            const grass = new THREE.Mesh(
+                new THREE.CircleGeometry(3, 16),
+                grassMaterial
+            );
+            grass.rotation.x = -Math.PI / 2;
+            grass.position.set(
+                Math.random() * 180 - 90,
+                0.01,
+                Math.random() * 180 - 90
+            );
+            grass.receiveShadow = true;
+            scene.add(grass);
+        }
+        
+        // Player state
+        const player = {
+            position: new THREE.Vector3(0, 1.6, 0),
+            velocity: new THREE.Vector3(0, 0, 0),
+            speed: 0.15,
+            jumpStrength: 0.3,
+            isJumping: false,
+            currentFloor: 1,
+            height: 1.6,
+            radius: 0.5
+        };
+        
+        // Doors system
+        const doors = [];
+        
+        function createDoor(x, y, z, rotation = 0, width = 2.2, targetFloor = null) {
+            const doorGroup = new THREE.Group();
+            
+            const doorFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(width, 3.2, 0.2),
+                buildingMaterial
+            );
+            doorGroup.add(doorFrame);
+            
+            const door = new THREE.Mesh(
+                new THREE.BoxGeometry(width - 0.2, 3, 0.1),
+                doorMaterial
+            );
+            door.castShadow = true;
+            door.userData.isDoor = true;
+            doorGroup.add(door);
+            
+            const handle = new THREE.Mesh(
+                new THREE.SphereGeometry(0.1, 8, 8),
+                new THREE.MeshStandardMaterial({ color: 0xffd700 })
+            );
+            handle.position.set((width - 0.2) * 0.4, 0, 0.06);
+            doorGroup.add(handle);
+            
+            doorGroup.position.set(x, y + 1.6, z); // Raised to y + 1.6 (middle of door height)
+            doorGroup.rotation.y = rotation;
+            scene.add(doorGroup);
+            
+            const doorData = {
+                mesh: doorGroup,
+                door: door,
+                position: new THREE.Vector3(x, y, z),
+                isOpen: false,
+                targetFloor: targetFloor,
+                originalRotation: rotation,
+                colliderId: null,
+                width: width
+            };
+            
+            // Add collider that will be removed when door opens - NO COLLISION initially for entrance
+            const colliderId = colliders.length;
+            addCollider(x, y, z, width, 3.2, 0.3, 'door');
+            doorData.colliderId = colliderId;
+            
+            doors.push(doorData);
+            
+            return doorGroup;
+        }
+        
+        // Create main building (3 floors)
+        function createMainBuilding() {
+            const building = new THREE.Group();
+            const floorHeight = 5;
+            
+            // Ground floor (Floor 1)
+            const floor1Walls = [
+                // Outer walls - back wall
+                { pos: [0, 2.5, -15], size: [30, 5, 0.5] },
+                // Left and right walls  
+                { pos: [-15, 2.5, 0], size: [0.5, 5, 30] },
+                { pos: [15, 2.5, 0], size: [0.5, 5, 30] },
+                // Front wall is added separately with opening
+                
+                // Internal walls
+                { pos: [0, 2.5, 5], size: [10, 5, 0.3] },   // Back internal wall
+            ];
+            
+            floor1Walls.forEach(wall => {
+                const wallMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(...wall.size),
+                    buildingMaterial
+                );
+                wallMesh.position.set(...wall.pos);
+                wallMesh.castShadow = true;
+                wallMesh.receiveShadow = true;
+                building.add(wallMesh);
+                addCollider(...wall.pos, ...wall.size);
+            });
+            
+            // Floor 1 floor
+            const floor1 = new THREE.Mesh(
+                new THREE.BoxGeometry(30, 0.2, 30),
+                new THREE.MeshStandardMaterial({ color: 0xdcdcdc })
+            );
+            floor1.position.set(0, 0.1, 0);
+            floor1.receiveShadow = true;
+            building.add(floor1);
+            
+            // Floor 2 (y = 5)
+            const floor2Walls = [
+                { pos: [0, 7.5, -15], size: [30, 5, 0.5] },
+                { pos: [0, 7.5, 15], size: [30, 5, 0.5] },
+                { pos: [-15, 7.5, 0], size: [0.5, 5, 30] },
+                { pos: [15, 7.5, 0], size: [0.5, 5, 30] },
+            ];
+            
+            floor2Walls.forEach(wall => {
+                const wallMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(...wall.size),
+                    buildingMaterial
+                );
+                wallMesh.position.set(...wall.pos);
+                wallMesh.castShadow = true;
+                wallMesh.receiveShadow = true;
+                building.add(wallMesh);
+                addCollider(...wall.pos, ...wall.size);
+            });
+            
+            const floor2 = new THREE.Mesh(
+                new THREE.BoxGeometry(30, 0.2, 30),
+                new THREE.MeshStandardMaterial({ color: 0xdcdcdc })
+            );
+            floor2.position.set(0, 5.1, 0);
+            floor2.receiveShadow = true;
+            building.add(floor2);
+            
+            // Floor 3 (Rooftop - y = 10)
+            const floor3 = new THREE.Mesh(
+                new THREE.BoxGeometry(30, 0.2, 30),
+                new THREE.MeshStandardMaterial({ color: 0xdcdcdc })
+            );
+            floor3.position.set(0, 10.1, 0);
+            floor3.receiveShadow = true;
+            building.add(floor3);
+            
+            // Roof
+            const roof = new THREE.Mesh(
+                new THREE.BoxGeometry(32, 0.5, 32),
+                new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+            );
+            roof.position.set(0, 15.25, 0);
+            roof.castShadow = true;
+            building.add(roof);
+            
+            // Windows for all floors
+            for (let floor = 0; floor < 3; floor++) {
+                const yPos = floor * 5 + 2.5;
+                
+                for (let i = -3; i <= 3; i++) {
+                    if (i === 0) continue; // Skip middle
+                    
+                    // Front windows
+                    const windowFront = new THREE.Mesh(
+                        new THREE.BoxGeometry(2, 2, 0.1),
+                        windowMaterial
+                    );
+                    windowFront.position.set(i * 4, yPos, 15.1);
+                    building.add(windowFront);
+                    
+                    // Back windows
+                    const windowBack = new THREE.Mesh(
+                        new THREE.BoxGeometry(2, 2, 0.1),
+                        windowMaterial
+                    );
+                    windowBack.position.set(i * 4, yPos, -15.1);
+                    building.add(windowBack);
+                }
+            }
+            
+            // Add doors - NO DOOR at front entrance, add opening in wall instead
+            // Front entrance opening - remove part of front wall
+            const frontWallLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(10, 5, 0.5),
+                buildingMaterial
+            );
+            frontWallLeft.position.set(-10, 2.5, 15);
+            frontWallLeft.castShadow = true;
+            frontWallLeft.receiveShadow = true;
+            building.add(frontWallLeft);
+            addCollider(-10, 2.5, 15, 10, 5, 0.5);
+            
+            const frontWallRight = new THREE.Mesh(
+                new THREE.BoxGeometry(10, 5, 0.5),
+                buildingMaterial
+            );
+            frontWallRight.position.set(10, 2.5, 15);
+            frontWallRight.castShadow = true;
+            frontWallRight.receiveShadow = true;
+            building.add(frontWallRight);
+            addCollider(10, 2.5, 15, 10, 5, 0.5);
+            
+            // Interior doors
+            createDoor(-5, 0, 0, Math.PI/2, 2.2); // Internal door
+            createDoor(5, 0, 0, Math.PI/2, 2.2); // Internal door
+            
+            // Add stairs between floors
+            createStairs(-12, 0.1, -12, 1, 2);
+            createStairs(-12, 5.1, -12, 2, 3);
+            
+            // Add elevator
+            createElevator(12, 0.1, -10);
+            
+            scene.add(building);
+        }
+        
+        // Stairs
+        const stairs = [];
+        
+        function createStairs(x, y, z, fromFloor, toFloor) {
+            const stairGroup = new THREE.Group();
+            const stepCount = 10;
+            const floorHeight = 5;
+            const totalHeight = floorHeight;
+            const stepHeight = totalHeight / stepCount;
+            const totalDepth = 5;
+            const stepDepth = totalDepth / stepCount;
+            
+            for (let i = 0; i < stepCount; i++) {
+                const step = new THREE.Mesh(
+                    new THREE.BoxGeometry(3, stepHeight, stepDepth),
+                    new THREE.MeshStandardMaterial({ color: 0x8b8b8b })
+                );
+                step.position.set(x, y + i * stepHeight + stepHeight/2, z + i * stepDepth + stepDepth/2);
+                step.castShadow = true;
+                step.receiveShadow = true;
+                stairGroup.add(step);
+            }
+            
+            stairGroup.userData = { 
+                fromFloor, 
+                toFloor, 
+                bounds: { 
+                    x: x, 
+                    y: y, 
+                    z: z, 
+                    width: 3, 
+                    depth: totalDepth 
+                } 
+            };
+            stairs.push(stairGroup);
+            scene.add(stairGroup);
+            
+            // Don't add collision for stairs - we handle them separately
+        }
+        
+        // Elevators
+        const elevators = [];
+        
+        function createElevator(x, y, z) {
+            const elevatorGroup = new THREE.Group();
+            
+            // Elevator shaft
+            const walls = [
+                new THREE.Mesh(new THREE.BoxGeometry(3, 15, 0.2), buildingMaterial),
+                new THREE.Mesh(new THREE.BoxGeometry(0.2, 15, 3), buildingMaterial),
+                new THREE.Mesh(new THREE.BoxGeometry(0.2, 15, 3), buildingMaterial),
+            ];
+            
+            walls[0].position.set(x, y + 7.5, z - 1.5);
+            walls[1].position.set(x - 1.5, y + 7.5, z);
+            walls[2].position.set(x + 1.5, y + 7.5, z);
+            
+            walls.forEach(wall => {
+                wall.castShadow = true;
+                elevatorGroup.add(wall);
+            });
+            
+            // Elevator car
+            const car = new THREE.Mesh(
+                new THREE.BoxGeometry(2.8, 2.5, 2.8),
+                new THREE.MeshStandardMaterial({ color: 0xcccccc })
+            );
+            car.position.set(x, y + 1.25, z);
+            car.castShadow = true;
+            elevatorGroup.add(car);
+            
+            scene.add(elevatorGroup);
+            
+            elevators.push({
+                mesh: car,
+                position: new THREE.Vector3(x, y, z),
+                currentFloor: 1,
+                isMoving: false
+            });
+            
+            addCollider(x, y, z, 3, 15, 3, 'elevator');
+        }
+        
+        // Characters
+        const characters = [];
+        
+        function createCharacter(name, role, x, z, shirtColor) {
+            const group = new THREE.Group();
+            
+            const torso = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.25, 0.3, 0.8, 8),
+                new THREE.MeshStandardMaterial({ color: shirtColor })
+            );
+            torso.position.y = 0.6;
+            torso.castShadow = true;
+            group.add(torso);
+            
+            const head = new THREE.Mesh(
+                new THREE.SphereGeometry(0.25, 8, 6),
+                new THREE.MeshStandardMaterial({ color: 0xffdbac })
+            );
+            head.position.y = 1.25;
+            head.castShadow = true;
+            group.add(head);
+            
+            const leftLeg = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.1, 0.8, 6),
+                new THREE.MeshStandardMaterial({ color: 0x2c3e50 })
+            );
+            leftLeg.position.set(-0.15, 0.4, 0);
+            group.add(leftLeg);
+            
+            const rightLeg = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.1, 0.8, 6),
+                new THREE.MeshStandardMaterial({ color: 0x2c3e50 })
+            );
+            rightLeg.position.set(0.15, 0.4, 0);
+            group.add(rightLeg);
+            
+            group.position.set(x, 0, z);
+            group.userData = { 
+                name, 
+                role,
+                initialPosition: new THREE.Vector3(x, 0, z),
+                targetPosition: new THREE.Vector3(x, 0, z),
+                moveTimer: 0,
+                currentFloor: 1
+            };
+            
+            characters.push(group);
+            scene.add(group);
+            
+            addCollider(x, 0, z, 0.6, 1.8, 0.6, 'character');
+            
+            return group;
+        }
+        
+        // Add co-founders at different locations
+        createCharacter('Dario Amodei', 'CEO', -5, -5, 0x4169e1);
+        createCharacter('Daniela Amodei', 'President', 5, -5, 0x9370db);
+        createCharacter('Jared Kaplan', 'Co-founder', -8, 5, 0x228b22);
+        createCharacter('Tom Brown', 'Co-founder', 8, 5, 0xffa500);
+        createCharacter('Chris Olah', 'Co-founder', -10, -8, 0xff6347);
+        createCharacter('Sam McCandlish', 'Co-founder', 10, -8, 0x20b2aa);
+        
+        // Cars system
+        const cars = [];
+        
+        function createCar(x, z, color) {
+            const carGroup = new THREE.Group();
+            
+            // Car body
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 0.8, 4),
+                new THREE.MeshStandardMaterial({ color: color })
+            );
+            body.position.y = 0.6;
+            body.castShadow = true;
+            carGroup.add(body);
+            
+            // Car roof
+            const roof = new THREE.Mesh(
+                new THREE.BoxGeometry(1.8, 0.6, 2),
+                new THREE.MeshStandardMaterial({ color: color })
+            );
+            roof.position.y = 1.3;
+            roof.castShadow = true;
+            carGroup.add(roof);
+            
+            // Windows
+            const windowMat = new THREE.MeshStandardMaterial({ 
+                color: 0x333333, 
+                transparent: true, 
+                opacity: 0.7 
+            });
+            
+            const frontWindow = new THREE.Mesh(
+                new THREE.BoxGeometry(1.7, 0.5, 0.1),
+                windowMat
+            );
+            frontWindow.position.set(0, 1.3, 1.05);
+            carGroup.add(frontWindow);
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16);
+            const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            
+            const wheelPositions = [
+                [-0.8, 0.3, 1.2],
+                [0.8, 0.3, 1.2],
+                [-0.8, 0.3, -1.2],
+                [0.8, 0.3, -1.2]
+            ];
+            
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(...pos);
+                wheel.castShadow = true;
+                carGroup.add(wheel);
+            });
+            
+            carGroup.position.set(x, 0, z);
+            scene.add(carGroup);
+            
+            cars.push({
+                mesh: carGroup,
+                position: new THREE.Vector3(x, 0, z),
+                rotation: 0,
+                speed: 0,
+                isPlayerDriving: false
+            });
+            
+            return carGroup;
+        }
+        
+        // Add cars around the city
+        const carColors = [0xff0000, 0x0000ff, 0xffff00, 0x00ff00, 0xff00ff, 0x00ffff, 0xffa500];
+        for (let i = 0; i < 8; i++) {
+            const x = Math.random() * 140 - 70;
+            const z = Math.random() * 140 - 70;
+            if (Math.abs(x) > 25 || Math.abs(z) > 25) {
+                createCar(x, z, carColors[i % carColors.length]);
+            }
+        }
+        for (let i = 0; i < 30; i++) {
+            const x = Math.random() * 160 - 80;
+            const z = Math.random() * 160 - 80;
+            // Keep them away from center building
+            if (Math.abs(x) < 20 && Math.abs(z) < 20) continue;
+            
+            const npc = createCharacter(
+                `Person ${i+1}`,
+                'City Resident',
+                x,
+                z,
+                Math.random() * 0xffffff
+            );
+            npc.userData.isNPC = true;
+        }
+        
+        // Create the city
+        createMainBuilding();
+        
+        // Add many decorative buildings to create a city
+        const buildingPositions = [
+            // North side
+            [-40, 0, -40], [-20, 0, -50], [0, 0, -60], [20, 0, -50], [40, 0, -40],
+            // South side
+            [-40, 0, 40], [-20, 0, 50], [20, 0, 50], [40, 0, 40],
+            // West side
+            [-50, 0, -20], [-60, 0, 0], [-50, 0, 20],
+            // East side
+            [50, 0, -20], [60, 0, 0], [50, 0, 20],
+            // More scattered buildings
+            [-30, 0, -30], [30, 0, -30], [-30, 0, 30], [30, 0, 30],
+            [-70, 0, -20], [70, 0, -20], [-70, 0, 20], [70, 0, 20]
+        ];
+        
+        buildingPositions.forEach((pos, i) => {
+            const height = 15 + Math.random() * 30;
+            const width = 8 + Math.random() * 8;
+            const depth = 8 + Math.random() * 8;
+            
+            const building = new THREE.Mesh(
+                new THREE.BoxGeometry(width, height, depth),
+                new THREE.MeshStandardMaterial({ 
+                    color: new THREE.Color().setHSL(Math.random(), 0.1, 0.7 + Math.random() * 0.2)
+                })
+            );
+            building.position.set(pos[0], height/2, pos[2]);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            scene.add(building);
+            // Don't add collider - we want to walk through decorative buildings
+            
+            // Add windows to buildings
+            const windowsPerFloor = 3;
+            const floors = Math.floor(height / 5);
+            
+            for (let floor = 0; floor < floors; floor++) {
+                for (let w = 0; w < windowsPerFloor; w++) {
+                    const windowSize = 1.5;
+                    const spacing = width / (windowsPerFloor + 1);
+                    
+                    // Front windows
+                    const windowFront = new THREE.Mesh(
+                        new THREE.BoxGeometry(windowSize, windowSize, 0.1),
+                        windowMaterial
+                    );
+                    windowFront.position.set(
+                        pos[0] + (w - 1) * spacing,
+                        floor * 5 + 2.5,
+                        pos[2] + depth/2 + 0.1
+                    );
+                    scene.add(windowFront);
+                }
+            }
+        });
+        
+        // Controls
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            keys[e.key] = true; // Store arrow keys too
+            
+            if (e.key === ' ' && !player.isJumping) {
+                player.velocity.y = player.jumpStrength;
+                player.isJumping = true;
+            }
+            
+            if (e.key.toLowerCase() === 'h') {
+                const helpModal = document.getElementById('help-modal');
+                helpModal.style.display = helpModal.style.display === 'block' ? 'none' : 'block';
+            }
+            
+            if (e.key.toLowerCase() === 'e') {
+                checkInteractions();
+            }
+            
+            if (e.key === 'Escape') {
+                document.getElementById('dialogue-box').style.display = 'none';
+                document.getElementById('help-modal').style.display = 'none';
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+            }
+            
+            // Prevent arrow keys from scrolling
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+            keys[e.key] = false; // Clear arrow keys too
+        });
+        
+        // Help button
+        document.getElementById('help-button').addEventListener('click', () => {
+            document.getElementById('help-modal').style.display = 'block';
+        });
+        
+        document.getElementById('close-help').addEventListener('click', () => {
+            document.getElementById('help-modal').style.display = 'none';
+        });
+        
+        // Mouse controls
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement === renderer.domElement) {
+                mouseX -= e.movementX * 0.002;
+                mouseY -= e.movementY * 0.002;
+                mouseY = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouseY));
+            }
+        });
+        
+        // Arrow key camera rotation
+        const lookSpeed = 0.05;
+        function updateArrowKeyLook() {
+            if (keys['ArrowLeft']) {
+                mouseX += lookSpeed;
+            }
+            if (keys['ArrowRight']) {
+                mouseX -= lookSpeed;
+            }
+            if (keys['ArrowUp']) {
+                mouseY = Math.min(Math.PI / 2, mouseY + lookSpeed);
+            }
+            if (keys['ArrowDown']) {
+                mouseY = Math.max(-Math.PI / 2, mouseY - lookSpeed);
+            }
+        }
+        
+        renderer.domElement.addEventListener('click', () => {
+            if (document.getElementById('dialogue-box').style.display !== 'block' &&
+                document.getElementById('help-modal').style.display !== 'block') {
+                renderer.domElement.requestPointerLock();
+            }
+        });
+        
+        // Collision detection
+        function checkCollision(pos, radius, height) {
+            for (let i = 0; i < colliders.length; i++) {
+                const collider = colliders[i];
+                if (collider.type === 'stairs' || collider.type === 'elevator') continue;
+                if (collider.disabled) continue; // Skip disabled colliders (open doors)
+                
+                if (pos.x + radius > collider.min.x && pos.x - radius < collider.max.x &&
+                    pos.y + height > collider.min.y && pos.y < collider.max.y &&
+                    pos.z + radius > collider.min.z && pos.z - radius < collider.max.z) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Interaction system
+        function checkInteractions() {
+            // Check for doors
+            doors.forEach(door => {
+                const distance = player.position.distanceTo(door.position);
+                if (distance < 3) {
+                    door.isOpen = !door.isOpen;
+                    
+                    // Animate door opening/closing
+                    if (door.isOpen) {
+                        door.door.rotation.y = Math.PI / 2;
+                        // Disable door collider when open
+                        if (door.colliderId !== null) {
+                            colliders[door.colliderId].disabled = true;
+                        }
+                        createFloatingText('🚪 Open', door.position);
+                    } else {
+                        door.door.rotation.y = 0;
+                        // Re-enable door collider when closed
+                        if (door.colliderId !== null) {
+                            colliders[door.colliderId].disabled = false;
+                        }
+                        createFloatingText('🚪 Closed', door.position);
+                    }
+                }
+            });
+            
+            // Check for elevators
+            elevators.forEach(elevator => {
+                const distance = player.position.distanceTo(elevator.position);
+                if (distance < 3 && !elevator.isMoving) {
+                    // Cycle through floors
+                    const targetFloor = (elevator.currentFloor % 3) + 1;
+                    elevator.isMoving = true;
+                    
+                    const startY = elevator.mesh.position.y;
+                    const endY = (targetFloor - 1) * 5 + 1.25;
+                    const duration = 2000;
+                    const startTime = Date.now();
+                    
+                    function animateElevator() {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        elevator.mesh.position.y = startY + (endY - startY) * progress;
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animateElevator);
+                        } else {
+                            elevator.currentFloor = targetFloor;
+                            elevator.isMoving = false;
+                            createFloatingText(`🛗 Floor ${targetFloor}`, elevator.position);
+                        }
+                    }
+                    
+                    animateElevator();
+                    createFloatingText('🛗 Going up!', elevator.position);
+                }
+            });
+            
+            // Check for characters
+            characters.forEach(character => {
+                const distance = player.position.distanceTo(character.position);
+                if (distance < 3) {
+                    openDialogue(character);
+                }
+            });
+            
+            // Check for cars
+            cars.forEach(car => {
+                const distance = player.position.distanceTo(car.position);
+                if (distance < 4) {
+                    if (!car.isPlayerDriving) {
+                        // Enter car
+                        car.isPlayerDriving = true;
+                        player.inCar = car;
+                        createFloatingText('🚗 Driving! WASD to move, E to exit', car.position);
+                    } else {
+                        // Exit car
+                        car.isPlayerDriving = false;
+                        car.speed = 0;
+                        player.inCar = null;
+                        player.position.set(
+                            car.position.x + 3,
+                            player.height,
+                            car.position.z
+                        );
+                        createFloatingText('🚗 Exited car', car.position);
+                    }
+                }
+            });
+        }
+        
+        // Dialogue system
+        const dialogueBox = document.getElementById('dialogue-box');
+        const dialogueName = document.getElementById('dialogue-name');
+        const dialogueContent = document.getElementById('dialogue-content');
+        const dialogueOptions = document.getElementById('dialogue-options');
+        
+        function openDialogue(character) {
+            dialogueBox.style.display = 'block';
+            dialogueName.textContent = `${character.userData.name} - ${character.userData.role}`;
+            
+            const greetings = [
+                `Hey! I'm ${character.userData.name}. Welcome to 3D City!`,
+                `Hi there! ${character.userData.name} here. Enjoying the city?`,
+                `Hello! I'm ${character.userData.name}. Have you explored all the floors yet?`
+            ];
+            
+            dialogueContent.innerHTML = `<p><strong>${character.userData.name}:</strong> ${greetings[Math.floor(Math.random() * greetings.length)]}</p>`;
+            
+            dialogueOptions.innerHTML = '';
+            const options = [
+                "Tell me about the city",
+                "What's on each floor?",
+                "Any hidden secrets?",
+                "Thanks, bye!"
+            ];
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'dialogue-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => {
+                    if (option === "Thanks, bye!") {
+                        dialogueBox.style.display = 'none';
+                    } else {
+                        const responses = {
+                            "Tell me about the city": "This is 3D City! We've got offices, labs, and even a rooftop garden. Use the elevators and stairs to explore!",
+                            "What's on each floor?": "Floor 1 has the lobby and meeting rooms. Floor 2 is our main office. Floor 3 is the rooftop garden - it's beautiful up there!",
+                            "Any hidden secrets?": "Well... I heard there's a secret server room somewhere. And the rooftop garden has some surprises. Keep exploring!"
+                        };
+                        dialogueContent.innerHTML += `<p><strong>You:</strong> ${option}</p>`;
+                        dialogueContent.innerHTML += `<p><strong>${character.userData.name}:</strong> ${responses[option]}</p>`;
+                    }
+                };
+                dialogueOptions.appendChild(optionDiv);
+            });
+            
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
+        }
+        
+        // Floating text effect
+        function createFloatingText(text, worldPos) {
+            const screenPos = worldPos.clone();
+            screenPos.project(camera);
+            
+            const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+            
+            const div = document.createElement('div');
+            div.className = 'floating-text';
+            div.textContent = text;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            document.body.appendChild(div);
+            
+            setTimeout(() => div.remove(), 2000);
+        }
+        
+        // Update floor indicator
+        function updateFloorIndicator() {
+            const floorY = player.position.y - player.height;
+            
+            if (floorY < 3) {
+                player.currentFloor = 1;
+            } else if (floorY < 8) {
+                player.currentFloor = 2;
+            } else {
+                player.currentFloor = 3;
+            }
+            
+            document.getElementById('floor-indicator').textContent = `Floor: ${player.currentFloor}`;
+        }
+        
+        // Check if player is on stairs
+        function checkStairs() {
+            for (const stair of stairs) {
+                const bounds = stair.userData.bounds;
+                const inBounds = 
+                    player.position.x > bounds.x - bounds.width/2 &&
+                    player.position.x < bounds.x + bounds.width/2 &&
+                    player.position.z > bounds.z &&
+                    player.position.z < bounds.z + bounds.depth;
+                
+                if (inBounds) {
+                    // Calculate position on stairs
+                    const progress = (player.position.z - bounds.z) / bounds.depth;
+                    const startFloor = (stair.userData.fromFloor - 1) * 5 + 0.1;
+                    const endFloor = (stair.userData.toFloor - 1) * 5 + 0.1;
+                    const targetY = startFloor + progress * (endFloor - startFloor) + player.height;
+                    
+                    // Smoothly move player to stair height
+                    player.position.y = targetY;
+                    player.velocity.y = 0;
+                    player.isJumping = false;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Show nearby interactions
+        const interactionPrompt = document.getElementById('interaction-prompt');
+        
+        function checkNearbyInteractions() {
+            let nearestInteraction = null;
+            let minDistance = 4;
+            
+            // Check doors
+            doors.forEach(door => {
+                const distance = player.position.distanceTo(door.position);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestInteraction = `Press E to ${door.isOpen ? 'close' : 'open'} door`;
+                }
+            });
+            
+            // Check elevators
+            elevators.forEach(elevator => {
+                const distance = player.position.distanceTo(elevator.position);
+                if (distance < minDistance && !elevator.isMoving) {
+                    minDistance = distance;
+                    nearestInteraction = 'Press E to use elevator';
+                }
+            });
+            
+            // Check all characters (including NPCs)
+            characters.forEach(character => {
+                const distance = player.position.distanceTo(character.position);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestInteraction = `Press E to talk to ${character.userData.name}`;
+                }
+            });
+            
+            // Check cars
+            cars.forEach(car => {
+                const distance = player.position.distanceTo(car.position);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    if (player.inCar === car) {
+                        nearestInteraction = 'Press E to exit car';
+                    } else {
+                        nearestInteraction = 'Press E to drive car';
+                    }
+                }
+            });
+            
+            if (nearestInteraction) {
+                interactionPrompt.textContent = nearestInteraction;
+                interactionPrompt.style.display = 'block';
+            } else {
+                interactionPrompt.style.display = 'none';
+            }
+        }
+        
+        // NPC movement
+        function updateNPCMovement(character, deltaTime) {
+            if (!character.userData.isNPC) return;
+            
+            character.userData.moveTimer -= deltaTime;
+            
+            if (character.userData.moveTimer <= 0) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 5 + Math.random() * 10;
+                character.userData.targetPosition = new THREE.Vector3(
+                    character.userData.initialPosition.x + Math.cos(angle) * distance,
+                    character.position.y,
+                    character.userData.initialPosition.z + Math.sin(angle) * distance
+                );
+                
+                character.userData.targetPosition.x = Math.max(-40, Math.min(40, character.userData.targetPosition.x));
+                character.userData.targetPosition.z = Math.max(-40, Math.min(40, character.userData.targetPosition.z));
+                
+                character.userData.moveTimer = 3 + Math.random() * 3;
+            }
+            
+            const direction = new THREE.Vector3().subVectors(character.userData.targetPosition, character.position);
+            direction.y = 0;
+            const distance = direction.length();
+            
+            if (distance > 0.1) {
+                direction.normalize();
+                character.position.add(direction.multiplyScalar(0.03));
+                character.lookAt(character.userData.targetPosition);
+                character.rotation.x = 0;
+                character.rotation.z = 0;
+            }
+        }
+        
+        // Animation loop
+        let lastTime = 0;
+        
+        function animate(currentTime) {
+            requestAnimationFrame(animate);
+            
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            // Check if player is in a car
+            if (player.inCar) {
+                const car = player.inCar;
+                
+                // Car controls
+                const carAcceleration = 0.01;
+                const maxSpeed = 0.3;
+                const turnSpeed = 0.05;
+                
+                if (keys['w']) {
+                    car.speed = Math.min(maxSpeed, car.speed + carAcceleration);
+                }
+                if (keys['s']) {
+                    car.speed = Math.max(-maxSpeed, car.speed - carAcceleration);
+                }
+                if (keys['a']) {
+                    car.rotation -= turnSpeed * (car.speed / maxSpeed);
+                }
+                if (keys['d']) {
+                    car.rotation += turnSpeed * (car.speed / maxSpeed);
+                }
+                
+                // Apply friction
+                car.speed *= 0.98;
+                
+                // Move car
+                car.position.x += Math.sin(car.rotation) * car.speed;
+                car.position.z += Math.cos(car.rotation) * car.speed;
+                car.mesh.rotation.y = car.rotation;
+                
+                // Update player position to car
+                player.position.copy(car.position);
+                player.position.y = 2; // Sitting in car
+                
+                // Camera follows car
+                camera.position.copy(player.position);
+            } else {
+                // Normal player movement
+                player.velocity.set(0, player.velocity.y, 0);
+                
+                if (keys['w']) player.velocity.z = player.speed;
+                if (keys['s']) player.velocity.z = -player.speed;
+                if (keys['a']) player.velocity.x = -player.speed;
+                if (keys['d']) player.velocity.x = player.speed;
+                
+                // Apply movement in camera direction
+                const forward = new THREE.Vector3(0, 0, -1);
+                forward.applyQuaternion(camera.quaternion);
+                forward.y = 0;
+                forward.normalize();
+                
+                const right = new THREE.Vector3(1, 0, 0);
+                right.applyQuaternion(camera.quaternion);
+                right.y = 0;
+                right.normalize();
+                
+                const oldPos = player.position.clone();
+                player.position.add(forward.multiplyScalar(player.velocity.z));
+                player.position.add(right.multiplyScalar(player.velocity.x));
+                
+                // Check collision
+                if (checkCollision(player.position, player.radius, player.height)) {
+                    player.position.copy(oldPos);
+                }
+                
+                // Check if on stairs
+                const onStairs = checkStairs();
+                
+                // Gravity (only if not on stairs)
+                if (!onStairs) {
+                    player.velocity.y -= 0.02;
+                    player.position.y += player.velocity.y;
+                    
+                    // Determine which floor we should be on
+                    let targetFloorHeight = 0;
+                    
+                    // Check if inside building (within bounds)
+                    const inBuilding = Math.abs(player.position.x) < 15 && Math.abs(player.position.z) < 15;
+                    
+                    if (inBuilding) {
+                        // Inside building - use multi-floor system
+                        if (player.position.y > 8) {
+                            targetFloorHeight = 10.1; // Floor 3
+                        } else if (player.position.y > 3) {
+                            targetFloorHeight = 5.1; // Floor 2
+                        } else {
+                            targetFloorHeight = 0.1; // Floor 1
+                        }
+                    } else {
+                        // Outside building - ground level
+                        targetFloorHeight = 0;
+                    }
+                    
+                    // Ground collision
+                    if (player.position.y - player.height < targetFloorHeight) {
+                        player.position.y = targetFloorHeight + player.height;
+                        player.velocity.y = 0;
+                        player.isJumping = false;
+                    }
+                }
+                
+                // Update camera
+                camera.position.copy(player.position);
+            }
+            
+            // Update arrow key camera rotation
+            updateArrowKeyLook();
+            
+            camera.rotation.y = mouseX;
+            camera.rotation.x = mouseY;
+            camera.rotation.order = 'YXZ';
+            
+            // Update floor indicator
+            updateFloorIndicator();
+            
+            // Update NPCs
+            characters.forEach(character => {
+                updateNPCMovement(character, deltaTime);
+            });
+            
+            // Check for nearby interactions
+            checkNearbyInteractions();
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Start the game
+        animate(0);
+    </script>
+</body>
+
+</html>
